@@ -1,0 +1,22 @@
+GIT
+  remote: git://github.com/droonga/droonga-client-ruby.git
+  revision: 0453d363a8ab19494f570434118c4d72b385873a
+  specs:
+    droonga-client (0.0.1)
+      fluent-logger
+      msgpack
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    fluent-logger (0.4.6)
+      msgpack (>= 0.4.4, < 0.6.0, != 0.5.3, != 0.5.2, != 0.5.1, != 0.5.0)
+      yajl-ruby (~> 1.0)
+    msgpack (0.5.5)
+    yajl-ruby (1.1.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  droonga-client!
