@@ -60,7 +60,6 @@ module Drntest
       client = Droonga::Client.new(tag: tag, port: port)
       envelope = JSON.parse(File.read(target))
       target_path = Pathname(target)
-      actual_path   = target_path.sub_ext(".actual")
       expected_path = target_path.sub_ext(".expected")
 
       print "#{target}: "
@@ -70,8 +69,6 @@ module Drntest
         return
       end
       actual = normalize_result(actual)
-      actual_json = actual.to_json
-      File.write(actual_path, actual_json)
 
       if File.exist?(expected_path)
         expected = JSON.parse(File.read(expected_path))
@@ -86,7 +83,10 @@ module Drntest
           p actual
         end
       else
-        puts "No expectation specified"
+        actual_path = target_path.sub_ext(".actual")
+        puts "No expectation specified. Saving result as #{actual_path}."
+        actual_json = actual.to_json
+        File.write(actual_path, actual_json)
       end
     end
 
