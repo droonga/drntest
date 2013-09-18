@@ -52,10 +52,25 @@ module Drntest
     end
 
     def run(*targets)
-      targets.each do |target|
-        run_test(target)
+      tests = load_tests(*targets)
+      tests.each do |test|
+        run_test(test)
       end
       0 # FIXME
+    end
+
+    def load_tests(*targets)
+      tests = []
+      targets.each do |target|
+        target_path = Pathname(target)
+        next unless target_path.exist?
+        if target_path.directory?
+          tests += Pathname.glob(target_path + "**" + "*.test")
+        else
+          tests << target_path
+        end
+      end
+      tests
     end
 
     def run_test(target)
