@@ -65,6 +65,10 @@ module Drntest
 
       print "#{target}: "
       actual = client.connection.send_receive(envelope)
+      unless actual
+        puts "No response received"
+        return
+      end
       actual[1] = 0 # Mask start time
       actual_json = actual.to_json
       File.write(actual_path, actual_json)
