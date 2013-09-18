@@ -69,6 +69,7 @@ module Drntest
         return
       end
       actual = normalize_result(actual)
+      actual_json = actual.to_json
 
       if File.exist?(expected_path)
         expected = JSON.parse(File.read(expected_path))
@@ -81,11 +82,13 @@ module Drntest
           p expected
           puts "Actual:"
           p actual
+          reject_path = target_path.sub_ext(".reject")
+          puts "Saving received result as #{reject_path}"
+          File.write(reject_path, actual_json)
         end
       else
         actual_path = target_path.sub_ext(".actual")
         puts "No expectation specified. Saving result as #{actual_path}."
-        actual_json = actual.to_json
         File.write(actual_path, actual_json)
       end
     end
