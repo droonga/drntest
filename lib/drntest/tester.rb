@@ -69,13 +69,13 @@ module Drntest
         puts "No response received"
         return
       end
-      actual[1] = 0 # Mask start time
+      actual = normalize_result(actual)
       actual_json = actual.to_json
       File.write(actual_path, actual_json)
 
       if File.exist?(expected_path)
         expected = JSON.parse(File.read(expected_path))
-        expected[1] = 0 # Mask start time
+        expected = normalize_result(expected)
         if expected == actual
           puts "PASS"
         else
@@ -88,6 +88,12 @@ module Drntest
       else
         puts "No expectation specified"
       end
+    end
+
+    def normalize_result(result)
+      result = result.dup
+      result[1] = 0 # Mask start time
+      result
     end
   end
 end
