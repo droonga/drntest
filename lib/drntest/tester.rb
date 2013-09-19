@@ -1,8 +1,4 @@
 require "optparse"
-require "json"
-require "droonga/client"
-require "tempfile"
-require "pp"
 require "drntest/test-runner"
 
 module Drntest

@@ -1,3 +1,8 @@
+require "json"
+require "droonga/client"
+require "tempfile"
+require "pp"
+
 module Drntest
   class TestRunner
     attr_reader :tester, :target_path
