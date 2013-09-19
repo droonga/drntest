@@ -37,7 +37,7 @@ module Drntest
       when :failure
         puts "FAILURE"
         output_reject_file(actual)
-        show_diff(expected, actual)
+        show_diff(result.expected, result.actual)
       when :not_checked
         puts "NOT CHECKED"
         output_actual_file(actual)
