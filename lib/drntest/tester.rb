@@ -65,6 +65,11 @@ module Drntest
           result.status
         ]
       end
+
+      puts
+      puts "==== Summary ===="
+      p test_suites_result.summary
+
       0 # FIXME
     end
 
