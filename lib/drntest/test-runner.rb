@@ -29,15 +29,26 @@ module Drntest
         else
           puts "FAIL"
           show_diff(expected, actual)
-          reject_path = target_path.sub_ext(".reject")
-          puts "Saving received result as #{reject_path}"
-          File.write(reject_path, actual_json)
+          output_reject_file(actual)
         end
       else
-        actual_path = target_path.sub_ext(".actual")
-        puts "No expectation specified. Saving result as #{actual_path}."
-        File.write(actual_path, actual_json)
+        output_actual_file(actual)
       end
+    end
+
+    def output_reject_file(actual_result)
+      output_actual_result(actual_result, ".reject")
+    end
+
+    def output_actual_file(actual_result)
+      output_actual_result(actual_result, ".actual")
+    end
+
+    def output_actual_result(actual_result, suffix)
+      output_path = target_path.sub_ext(suffix)
+      puts "Saving received result as #{output_path}"
+      actual_json = actual_result.to_json
+      File.write(output_path, actual_json)
     end
 
     def show_diff(expected, actual)
