@@ -2,6 +2,7 @@ require "json"
 require "droonga/client"
 require "tempfile"
 require "pp"
+require "drntest/test-result"
 
 module Drntest
   class TestRunner
@@ -14,28 +15,34 @@ module Drntest
 
     def run
       client = Droonga::Client.new(tag: tester.tag, port: tester.port)
+      result = TestResult.new
 
       print "#{target_path}: "
       request_envelope = load_request_envelope
       actual = client.connection.send_receive(request_envelope)
-      unless actual
-        puts "No response received"
-        return
+      if actual
+        actual = normalize_result(actual)
+        result.actual = actual
       end
-      actual = normalize_result(actual)
 
       if expected_exist?
-        expected = load_expected
-        if expected == actual
-          puts "PASS"
-        else
-          puts "FAIL"
-          show_diff(expected, actual)
-          output_reject_file(actual)
-        end
-      else
+        result.expected = load_expected
+      end
+
+      case result.status
+      when :success
+        puts "PASS"
+      when :no_response
+        puts "NO RESPONSE"
+      when :failure
+        puts "FAIL"
+        output_reject_file(actual)
+        show_diff(expected, actual)
+      when :not_checked
         output_actual_file(actual)
       end
+
+      result
     end
 
     def load_request_envelope
