@@ -24,7 +24,6 @@ module Drntest
         return
       end
       actual = normalize_result(actual)
-      actual_json = actual.to_json
 
       if File.exist?(expected_path)
         expected = JSON.parse(File.read(expected_path))
