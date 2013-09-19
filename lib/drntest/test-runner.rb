@@ -3,6 +3,7 @@ require "droonga/client"
 require "tempfile"
 require "pp"
 require "drntest/test-result"
+require "fileutils"
 
 module Drntest
   class TestRunner
@@ -32,6 +33,7 @@ module Drntest
       case result.status
       when :success
         puts "SUCCESS"
+        remove_reject_file
       when :no_response
         puts "NO RESPONSE"
       when :failure
@@ -61,6 +63,14 @@ module Drntest
 
     def expected_path
       target_path.sub_ext(".expected")
+    end
+
+    def reject_path
+      target_path.sub_ext(".reject")
+    end
+
+    def remove_reject_file
+      FileUtils.rm_rf(reject_path, :secure => true)
     end
 
     def output_reject_file(actual_result)
