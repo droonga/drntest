@@ -24,9 +24,8 @@ module Drntest
       end
       actual = normalize_result(actual)
 
-      if expected_path.exist?
-        expected = JSON.parse(expected_path.read)
-        expected = normalize_result(expected)
+      if expected_exist?
+        expected = load_expected
         if expected == actual
           puts "PASS"
         else
@@ -37,6 +36,15 @@ module Drntest
       else
         output_actual_file(actual)
       end
+    end
+
+    def load_expected
+      expected = JSON.parse(expected_path.read)
+      normalize_result(expected)
+    end
+
+    def expected_exist?
+      expected_path.exist?
     end
 
     def expected_path
