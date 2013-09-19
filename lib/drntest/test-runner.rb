@@ -1,19 +1,18 @@
 module Drntest
   class TestRunner
-    attr_reader :tester, :target
+    attr_reader :tester, :target_path
 
     def initialize(tester, target)
       @tester = tester
-      @target = target
+      @target_path = Pathname(target)
     end
 
     def run
       client = Droonga::Client.new(tag: tester.tag, port: tester.port)
-      envelope = JSON.parse(File.read(target))
-      target_path = Pathname(target)
+      envelope = JSON.parse(target_path.read)
       expected_path = target_path.sub_ext(".expected")
 
-      print "#{target}: "
+      print "#{target_path}: "
       actual = client.connection.send_receive(envelope)
       unless actual
         puts "No response received"
