@@ -14,10 +14,10 @@ module Drntest
 
     def run
       client = Droonga::Client.new(tag: tester.tag, port: tester.port)
-      envelope = JSON.parse(target_path.read)
 
       print "#{target_path}: "
-      actual = client.connection.send_receive(envelope)
+      request_envelope = load_request_envelope
+      actual = client.connection.send_receive(request_envelope)
       unless actual
         puts "No response received"
         return
@@ -36,6 +36,10 @@ module Drntest
       else
         output_actual_file(actual)
       end
+    end
+
+    def load_request_envelope
+      JSON.parse(target_path.read)
     end
 
     def load_expected
