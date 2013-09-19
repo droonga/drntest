@@ -69,20 +69,23 @@ module Drntest
       target_path.sub_ext(".reject")
     end
 
+    def actual_path
+      target_path.sub_ext(".actual")
+    end
+
     def remove_reject_file
       FileUtils.rm_rf(reject_path, :secure => true)
     end
 
     def output_reject_file(actual_result)
-      output_actual_result(actual_result, ".reject")
+      output_actual_result(actual_result, reject_path)
     end
 
     def output_actual_file(actual_result)
-      output_actual_result(actual_result, ".actual")
+      output_actual_result(actual_result, actual_path)
     end
 
-    def output_actual_result(actual_result, suffix)
-      output_path = target_path.sub_ext(suffix)
+    def output_actual_result(actual_result, output_path)
       puts "Saving received result as #{output_path}"
       actual_json = JSON.pretty_generate(actual_result)
       File.write(output_path, actual_json)
