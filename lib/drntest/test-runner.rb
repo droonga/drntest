@@ -51,7 +51,7 @@ module Drntest
     def output_actual_result(actual_result, suffix)
       output_path = target_path.sub_ext(suffix)
       puts "Saving received result as #{output_path}"
-      actual_json = actual_result.to_json
+      actual_json = JSON.pretty_generate(actual_result)
       File.write(output_path, actual_json)
     end
 
