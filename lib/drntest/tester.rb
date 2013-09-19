@@ -1,5 +1,6 @@
 require "optparse"
 require "drntest/test-runner"
+require "drntest/test-suites-result"
 
 module Drntest
   class Tester
@@ -49,10 +50,20 @@ module Drntest
     end
 
     def run(*targets)
+      test_suites_result = TestSuitesResult.new
       tests = load_tests(*targets)
       tests.each do |test|
         test_runner = TestRunner.new(self, test)
-        test_runner.run
+        test_suites_result.test_results << test_runner.run
+      end
+
+      puts
+      puts "==== Test Results ===="
+      test_suites_result.test_results.each do |result|
+        puts "%s: %s" % [
+          result.name,
+          result.status
+        ]
       end
       0 # FIXME
     end

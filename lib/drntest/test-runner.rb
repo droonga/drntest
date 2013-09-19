@@ -15,7 +15,7 @@ module Drntest
 
     def run
       client = Droonga::Client.new(tag: tester.tag, port: tester.port)
-      result = TestResult.new
+      result = TestResult.new(target_path.to_s)
 
       print "#{target_path}: "
       request_envelope = load_request_envelope
@@ -31,14 +31,15 @@ module Drntest
 
       case result.status
       when :success
-        puts "PASS"
+        puts "SUCCESS"
       when :no_response
         puts "NO RESPONSE"
       when :failure
-        puts "FAIL"
+        puts "FAILURE"
         output_reject_file(actual)
         show_diff(expected, actual)
       when :not_checked
+        puts "NOT CHECKED"
         output_actual_file(actual)
       end
 

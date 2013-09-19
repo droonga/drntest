@@ -1,8 +1,9 @@
 module Drntest
   class TestResult
-    attr_accessor :expected, :actual
+    attr_accessor :name, :expected, :actual
 
-    def initialize
+    def initialize(name)
+      @name = name
       @expected = nil
       @actual = nil
     end
