@@ -25,8 +25,8 @@ module Drntest
       end
       actual = normalize_result(actual)
 
-      if File.exist?(expected_path)
-        expected = JSON.parse(File.read(expected_path))
+      if expected_path.exist?
+        expected = JSON.parse(expected_path.read)
         expected = normalize_result(expected)
         if expected == actual
           puts "PASS"
