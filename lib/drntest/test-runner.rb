@@ -15,7 +15,6 @@ module Drntest
     def run
       client = Droonga::Client.new(tag: tester.tag, port: tester.port)
       envelope = JSON.parse(target_path.read)
-      expected_path = target_path.sub_ext(".expected")
 
       print "#{target_path}: "
       actual = client.connection.send_receive(envelope)
@@ -38,6 +37,10 @@ module Drntest
       else
         output_actual_file(actual)
       end
+    end
+
+    def expected_path
+      target_path.sub_ext(".expected")
     end
 
     def output_reject_file(actual_result)
