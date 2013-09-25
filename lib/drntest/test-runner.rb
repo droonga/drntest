@@ -92,8 +92,8 @@ module Drntest
     end
 
     def show_diff(expected, actual)
-      expected_pretty = expected.pretty_inspect
-      actual_pretty = actual.pretty_inspect
+      expected_pretty = JSON.pretty_generate(expected)
+      actual_pretty = JSON.pretty_generate(actual)
 
       create_temporary_file("expected", expected_pretty) do |expected_file|
         create_temporary_file("actual", actual_pretty) do |actual_file|
