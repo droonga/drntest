@@ -37,16 +37,22 @@ module Drntest
           tester.tag = tag
         end
 
+        parser.on("--testcase=PATTERN",
+                  "Run only testcases which have a name matched to the given PATTERN") do |pattern|
+          tester.pattern = pattern
+        end
+
         parser
       end
     end
 
-    attr_accessor :port, :host, :tag
+    attr_accessor :port, :host, :tag, :pattern
 
     def initialize
       @port = 24224
       @host = "localhost"
       @tag  = "droonga"
+      @pattern = nil
     end
 
     def run(*targets)
@@ -84,6 +90,20 @@ module Drntest
           tests << target_path
         end
       end
+
+      unless @pattern.nil?
+        if @pattern =~ /\A\/.+\/\z/
+          matcher = Regexp.new(@pattern[1..-2])
+          tests.select! do |test|
+            test.basename(".test").to_s =~ matcher
+          end
+        else
+          tests.select! do |test|
+            test.basename(".test").to_s == @pattern
+          end
+        end
+      end
+
       tests
     end
   end
