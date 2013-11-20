@@ -1,4 +1,5 @@
 require "optparse"
+require "drntest/version"
 require "drntest/test-runner"
 require "drntest/test-suites-result"
 
