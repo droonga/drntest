@@ -33,9 +33,10 @@ module Drntest
       result = TestResult.new(target_path.to_s)
 
       print "#{target_path}: "
-      actual = execute_commands
+      request_envelope = load_request_envelope
+      actual = execute_commands(request_envelope)
       if actual
-        actual = normalize_result(actual)
+        actual = normalize_result(request_envelope, actual)
         result.actual = actual
       end
 
@@ -62,9 +63,8 @@ module Drntest
     end
 
     private
-    def execute_commands
+    def execute_commands(request_envelope)
       client = Droonga::Client.new(tag: tester.tag, port: tester.port)
-      request_envelope = load_request_envelope
       actual = client.connection.send(request_envelope, :response => :one)
     end
 
@@ -133,10 +133,51 @@ module Drntest
       yield(file)
     end
 
-    def normalize_result(result)
+    def normalize_result(requet_envelope, result)
+      result = normalize_envelope(result)
+      normalize_body(requet_envelope, result)
+    end
+
+    def normalize_envelope(result)
       result = result.dup
       result[1] = 0 # Mask start time
       result
+    end
+
+    def normalize_body(request_envelope, result)
+      if groonga_command?(request_envelope)
+        normalize_groonga_command_result(result)
+      else
+        result
+      end
+    end
+
+    GROONGA_COMMANDS = [
+      "table_create",
+    ]
+    def groonga_command?(request_envelope)
+      GROONGA_COMMANDS.include?(request_envelope["type"])
+    end
+
+    def normalize_groonga_command_result(result)
+      result = result.dup
+      header, *return_values = result[2]["body"]
+      normalized_header = normalize_groonga_command_header(header)
+      result[2]["body"] = [normalized_header, *return_values]
+      result
+    end
+
+    def normalize_groonga_command_header(header)
+      status_code, start_time, elapsed, *others = header
+      normalized_start_time = 0.0
+      normalized_elapsed = 0.0
+
+      [
+        status_code,
+        normalized_start_time,
+        normalized_elapsed,
+        *others,
+      ]
     end
   end
 end
