@@ -14,10 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 require "json"
-require "droonga/client"
 require "tempfile"
 require "pp"
 require "drntest/test-result"
+require "drntest/executor"
 require "fileutils"
 
 module Drntest
@@ -34,11 +34,8 @@ module Drntest
 
       print "#{target_path}: "
       request_envelope = load_request_envelope
-      actual = execute_commands(request_envelope)
-      if actual
-        actual = normalize_result(request_envelope, actual)
-        result.actual = actual
-      end
+      executor = Executor.new(tester, request_envelope)
+      result.actual = executor.execute
 
       if expected_exist?
         result.expected = load_expected
@@ -63,11 +60,6 @@ module Drntest
     end
 
     private
-    def execute_commands(request_envelope)
-      client = Droonga::Client.new(tag: tester.tag, port: tester.port)
-      actual = client.connection.send(request_envelope, :response => :one)
-    end
-
     def load_request_envelope
       JSON.parse(target_path.read)
     end
@@ -133,53 +125,6 @@ module Drntest
       file.write(content)
       file.close
       yield(file)
-    end
-
-    def normalize_result(requet_envelope, result)
-      result = normalize_envelope(result)
-      normalize_body(requet_envelope, result)
-    end
-
-    def normalize_envelope(result)
-      result = result.dup
-      result[1] = 0 # Mask start time
-      result
-    end
-
-    def normalize_body(request_envelope, result)
-      if groonga_command?(request_envelope)
-        normalize_groonga_command_result(result)
-      else
-        result
-      end
-    end
-
-    GROONGA_COMMANDS = [
-      "table_create",
-    ]
-    def groonga_command?(request_envelope)
-      GROONGA_COMMANDS.include?(request_envelope["type"])
-    end
-
-    def normalize_groonga_command_result(result)
-      result = result.dup
-      header, *return_values = result[2]["body"]
-      normalized_header = normalize_groonga_command_header(header)
-      result[2]["body"] = [normalized_header, *return_values]
-      result
-    end
-
-    def normalize_groonga_command_header(header)
-      status_code, start_time, elapsed, *others = header
-      normalized_start_time = 0.0
-      normalized_elapsed = 0.0
-
-      [
-        status_code,
-        normalized_start_time,
-        normalized_elapsed,
-        *others,
-      ]
     end
   end
 end
