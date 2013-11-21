@@ -73,8 +73,7 @@ module Drntest
     end
 
     def load_expected
-      expected = JSON.parse(expected_path.read)
-      normalize_result(expected)
+      JSON.parse(expected_path.read)
     end
 
     def expected_exist?
