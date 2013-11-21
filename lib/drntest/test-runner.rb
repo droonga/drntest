@@ -30,12 +30,10 @@ module Drntest
     end
 
     def run
-      client = Droonga::Client.new(tag: tester.tag, port: tester.port)
       result = TestResult.new(target_path.to_s)
 
       print "#{target_path}: "
-      request_envelope = load_request_envelope
-      actual = client.connection.send(request_envelope, :response => :one)
+      actual = execute_commands
       if actual
         actual = normalize_result(actual)
         result.actual = actual
@@ -61,6 +59,13 @@ module Drntest
       end
 
       result
+    end
+
+    private
+    def execute_commands
+      client = Droonga::Client.new(tag: tester.tag, port: tester.port)
+      request_envelope = load_request_envelope
+      actual = client.connection.send(request_envelope, :response => :one)
     end
 
     def load_request_envelope
