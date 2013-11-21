@@ -107,7 +107,9 @@ module Drntest
     def output_actual_result(actual_result, output_path)
       puts "Saving received result as #{output_path}"
       actual_json = JSON.pretty_generate(actual_result)
-      File.write(output_path, actual_json)
+      File.open(output_path, "w") do |file|
+        file.puts(actual_json)
+      end
     end
 
     def show_diff(expected, actual)
