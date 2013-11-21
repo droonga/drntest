@@ -35,7 +35,7 @@ module Drntest
 
       print "#{target_path}: "
       request_envelope = load_request_envelope
-      actual = client.connection.send_receive(request_envelope)
+      actual = client.connection.send(request_envelope, :response => :one)
       if actual
         actual = normalize_result(actual)
         result.actual = actual
