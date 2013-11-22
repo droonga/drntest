@@ -49,11 +49,11 @@ module Drntest
         puts "NO RESPONSE"
       when :failure
         puts "FAILURE"
-        output_reject_file(actual)
+        output_reject_file(result.actual)
         show_diff(result.expected, result.actual)
       when :not_checked
         puts "NOT CHECKED"
-        output_actual_file(actual)
+        output_actual_file(result.actual)
       end
 
       result
