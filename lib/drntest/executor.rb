@@ -55,6 +55,7 @@ module Drntest
 
     GROONGA_COMMANDS = [
       "table_create",
+      "select",
     ]
     def groonga_command?
       GROONGA_COMMANDS.include?(request["type"])
