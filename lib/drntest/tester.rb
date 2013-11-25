@@ -88,8 +88,6 @@ module Drntest
       tests = load_tests(*targets)
       tests.each do |test|
         test_runner = TestRunner.new(self, test)
-        test_runner.config = @config
-        test_runner.catalog = @catalog
         test_suites_result.test_results << test_runner.run
       end
 
