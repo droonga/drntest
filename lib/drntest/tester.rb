@@ -65,8 +65,8 @@ module Drntest
 
         parser.on("--fluentd=PATH",
                   "Path to the fluentd executable",
-                  "(#{tester.fluentd})") do |tag|
-          tester.tag = tag
+                  "(#{tester.fluentd})") do |fluentd|
+          tester.fluentd = fluentd
         end
 
         parser.on("--testcase=PATTERN",
