@@ -32,7 +32,14 @@ module Drntest
 
     def run
       print "#{target_path}: "
+      options = load_options
+      process_requests
+    end
+
+    private
+    def process_requests
       results = TestResults.new(target_path.to_s)
+
       load_request_envelopes.each do |request|
         executor = Executor.new(tester, request)
         results.actuals << executor.execute
@@ -59,7 +66,15 @@ module Drntest
       results
     end
 
-    private
+    def load_options
+      options = {}
+      target_path.read.each_line do |line|
+        next unless /\A#([^\s]+)\s+(.+)\z/ =~ line
+        options[$1] = $2
+      end
+      options
+    end
+
     def load_request_envelopes
       load_jsons(target_path)
     end
@@ -74,7 +89,11 @@ module Drntest
       parser.on_parse_complete = Proc.new do |json_object|
         json_objects << json_object
       end
-      parser << pathname.read
+      pathname.read.each_line do |line|
+        unless line[0] == "#"
+          parser << line 
+        end
+      end
       json_objects
     end
 
