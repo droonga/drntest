@@ -129,7 +129,7 @@ module Drntest
     end
 
     def temporary_engine?
-      config && config.exist?
+      @owner.fluend && config && config.exist?
     end
 
     def process_requests
