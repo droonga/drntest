@@ -60,6 +60,7 @@ module Drntest
 
     GROONGA_COMMANDS = [
       "table_create",
+      "column_create",
       "select",
     ]
     def groonga_command?
