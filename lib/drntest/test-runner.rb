@@ -65,7 +65,7 @@ module Drntest
     private
     def prepare
       options = load_options
-      self.catalog_file = Pathname(options[:CONFIG]) if options[:CONFIG]
+      self.config_file = Pathname(options[:CONFIG]) if options[:CONFIG]
       self.catalog_file = Pathname(options[:CATALOG]) if options[:CATALOG]
     end
 
