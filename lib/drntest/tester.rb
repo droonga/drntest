@@ -54,12 +54,12 @@ module Drntest
         end
 
         parser.on("--config=PATH",
-                  "Path to the default configuration file of droonga engine" do |config|
+                  "Path to the default configuration file of Droonga engine" do |config|
           tester.config = config
         end
 
         parser.on("--catalog=PATH",
-                  "Path to the default catalog file of droonga engine" do |catalog|
+                  "Path to the default catalog file of Droonga engine" do |catalog|
           tester.catalog = catalog
         end
 
