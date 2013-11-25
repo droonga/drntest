@@ -23,29 +23,46 @@ require "fileutils"
 
 module Drntest
   class TestRunner
-    attr_reader :tester, :target_path
+    attr_reader :tester, :target_path, :config_dir, :config_file, :catalog_file
 
     def initialize(tester, target)
       @tester = tester
       @target_path = Pathname(target)
-      prepare
     end
 
     def run
       print "#{target_path}: "
+      prepare
       setup
       results = process_requests
       teardown
       results
     end
 
+    def config_dir
+      return @config_dir if @config_dir
+      return @config_file.parent if @config_file
+      target_path.parent
+    end
+
+    def config_dir=(path)
+      @config_dir = Pathname(path)
+    end
+
+    def config_file=(path)
+      @config_file = Pathname(path)
+    end
+
+    def catalog_file=(path)
+      @catalog_file = Pathname(path)
+    end
+
     private
     def prepare
       options = load_options
 
-      @config_dir = target_path.parent
-      @config_file = config_dir + "fluentd.conf"
-      @catalog_file = config_dir + "catalog.json"
+      @config_file ||= config_dir + "fluentd.conf"
+      @catalog_file ||= config_dir + "catalog.json"
 
       if options[:CONFIG]
         @config_file = Pathname(options[:CONFIG])
@@ -70,7 +87,7 @@ module Drntest
     end
 
     def temporary_dir
-      @config_dir + "tmp"
+      config_dir + "tmp"
     end
 
     def process_requests
