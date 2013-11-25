@@ -133,9 +133,9 @@ module Drntest
         else
           matcher = @pattern
         end
-          tests.select! do |test|
-            matcher === test.basename(".test").to_s
-          end
+        tests.select! do |test|
+          matcher === test.basename(".test").to_s
+        end
       end
 
       tests
