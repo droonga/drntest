@@ -28,6 +28,7 @@ module Drntest
     def initialize(owner, target)
       @owner = owner
       @target_path = Pathname(target)
+      @options = load_options
     end
 
     def run
@@ -62,14 +63,25 @@ module Drntest
       @catalog = Pathname(path)
     end
 
+    def port
+      @port || @config[:port] || tester.port
+    end
+
+    def host
+      @host || @config[:host] || tester.host
+    end
+
+    def tag
+      @tag || @config[:tag] || tester.tag
+    end
+
     private
     def prepare
       self.config = owner.config if owner.config
       self.catalog = owner.catalog if owner.catalog
 
-      options = load_options
-      self.config = Pathname(options[:config]) if options[:config]
-      self.catalog = Pathname(options[:catalog]) if options[:catalog]
+      self.config = Pathname(@options[:config]) if @options[:config]
+      self.catalog = Pathname(@options[:catalog]) if @options[:catalog]
     end
 
     def setup
@@ -112,7 +124,7 @@ module Drntest
       results = TestResults.new(target_path)
 
       load_request_envelopes.each do |request|
-        executor = Executor.new(tester, request)
+        executor = Executor.new(self, request)
         results.actuals << executor.execute
       end
       if expected_exist?
