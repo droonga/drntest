@@ -23,10 +23,10 @@ require "fileutils"
 
 module Drntest
   class TestRunner
-    attr_reader :tester, :target_path
+    attr_reader :owner, :target_path
 
-    def initialize(tester, target)
-      @tester = tester
+    def initialize(owner, target)
+      @owner = owner
       @target_path = Pathname(target)
     end
 
@@ -40,53 +40,53 @@ module Drntest
     end
 
     def config_dir
-      return @config_file.parent if @config_file
+      return @config.parent if @config
       @target_path.parent
     end
 
-    def config_file
-      @config_file || @config_dir + "fluentd.conf"
+    def config
+      @config || @config_dir + "fluentd.conf"
     end
 
-    def config_file=(path)
+    def config=(path)
       path = Pathname(path)
       path += "fluentd.conf" if path.directory?
-      @config_file = path
+      @config = path
     end
 
-    def catalog_file
-      @catalog_file || @config_dir + "catalog.json"
+    def catalog
+      @catalog || @config_dir + "catalog.json"
     end
 
-    def catalog_file=(path)
-      @catalog_file = Pathname(path)
+    def catalog=(path)
+      @catalog = Pathname(path)
     end
 
     private
     def prepare
-      self.config_file = tester.config if tester.config
-      self.catalog_file = tester.catalog if tester.catalog
+      self.config = owner.config if owner.config
+      self.catalog = owner.catalog if owner.catalog
 
       options = load_options
-      self.config_file = Pathname(options[:config]) if options[:config]
-      self.catalog_file = Pathname(options[:catalog]) if options[:catalog]
+      self.config = Pathname(options[:config]) if options[:config]
+      self.catalog = Pathname(options[:catalog]) if options[:catalog]
     end
 
     def setup
-      unless config_file.exist?
-        raise "Missing config file: #{config_file.to_s}"
+      unless config.exist?
+        raise "Missing config file: #{config.to_s}"
       end
-      unless catalog_file.exist?
-        raise "Missing catalog file: #{catalog_file.to_s}"
+      unless catalog.exist?
+        raise "Missing catalog file: #{catalog.to_s}"
       end
 
       FileUtils.rm_rf(temporary_dir)
       FileUtils.mkdir_p(temporary_dir)
 
       temporary_config = temporary_dir + "fluentd.conf"
-      FileUtils.cp(config_file, temporary_config)
+      FileUtils.cp(config, temporary_config)
       temporary_catalog = temporary_dir + "catalog.json"
-      FileUtils.cp(catalog_file, temporary_catalog)
+      FileUtils.cp(catalog, temporary_catalog)
 
       engine_command = "fluentd --config #{temporary_config}"
       engine_env = {

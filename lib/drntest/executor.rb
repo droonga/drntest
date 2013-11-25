@@ -17,10 +17,10 @@ require "droonga/client"
 
 module Drntest
   class Executor
-    attr_reader :tester, :request
+    attr_reader :owner, :request
 
-    def initialize(tester, request)
-      @tester = tester
+    def initialize(owner, request)
+      @owner = owner
       @request = request
     end
 
@@ -30,7 +30,7 @@ module Drntest
 
     private
     def execute_commands
-      client = Droonga::Client.new(tag: tester.tag, port: tester.port)
+      client = Droonga::Client.new(tag: owner.tag, port: owner.port)
       client.connection.send(request, :response => :one)
     end
 
