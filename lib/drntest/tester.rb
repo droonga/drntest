@@ -89,8 +89,7 @@ module Drntest
       @tag  = "droonga"
       @config  = nil
       @catalog = nil
-      path_to_fluentd = `which fluentd`.strip
-      @fluentd = path_to_fluentd unless path_to_fluentd.empty?
+      @fluentd = "fluentd"
       @pattern = nil
     end
 
