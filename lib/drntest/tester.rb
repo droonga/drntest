@@ -98,7 +98,7 @@ module Drntest
       @config  = nil
       @catalog = nil
       @fluentd = "fluentd"
-      @fluetnd_options = []
+      @fluentd_options = []
       @pattern = nil
     end
 
