@@ -66,15 +66,15 @@ module Drntest
     end
 
     def port
-      @port || @config[:port] || @owner.port
+      @port || @options[:port] || @owner.port
     end
 
     def host
-      @host || @config[:host] || @owner.host
+      @host || @options[:host] || @owner.host
     end
 
     def tag
-      @tag || @config[:tag] || @owner.tag
+      @tag || @options[:tag] || @owner.tag
     end
 
     private
