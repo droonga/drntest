@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 require "json"
+require "yajl"
 require "tempfile"
 require "pp"
 require "drntest/test-results"
