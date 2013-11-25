@@ -77,7 +77,13 @@ module Drntest
         raise "Missing catalog file: #{catalog_file.to_s}"
       end
 
-      FileUtils.rm_rf(temporary_dir.to_s)
+      FileUtils.rm_rf(temporary_dir)
+      FileUtils.mkdir_p(temporary_dir)
+
+      temporary_config = temporary_dir + "fluentd.conf"
+      FileUtils.cp(config_file, temporary_config)
+      temporary_catalog = temporary_dir + "catalog.json"
+      FileUtils.cp(catalog_file, temporary_catalog)
     end
 
     def teardown
@@ -89,7 +95,7 @@ module Drntest
     end
 
     def process_requests
-      results = TestResults.new(target_path.to_s)
+      results = TestResults.new(target_path)
 
       load_request_envelopes.each do |request|
         executor = Executor.new(tester, request)
