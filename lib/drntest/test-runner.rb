@@ -32,7 +32,7 @@ module Drntest
     end
 
     def run
-      print "#{target_path}: "
+      print "#{@target_path}: "
       prepare
       setup
       results = process_requests
@@ -50,7 +50,7 @@ module Drntest
     end
 
     def config=(path)
-      path = Pathname(path)
+      path = Pathname(path).expand_path(@target_path.parent)
       path += "fluentd.conf" if path.directory?
       @config = path
     end
@@ -59,7 +59,7 @@ module Drntest
       path = @catalog
       path ||= config_dir + "catalog.json" if config_dir
       if path
-        Pathname(path)
+        Pathname(path).expand_path(@target_path.parent)
       else
         nil
       end
@@ -133,7 +133,7 @@ module Drntest
     end
 
     def process_requests
-      results = TestResults.new(target_path)
+      results = TestResults.new(@target_path)
 
       load_request_envelopes.each do |request|
         executor = Executor.new(self, request)
@@ -163,15 +163,15 @@ module Drntest
 
     def load_options
       options = {}
-      target_path.read.each_line do |line|
-        next unless /\A\#\@([^\s]+)\s+(.+)\z/ =~ line
+      @target_path.read.each_line do |line|
+        next unless /\A\#\@([^\s]+)\s+(.+)\n?\z/ =~ line
         options[$1.to_sym] = $2
       end
       options
     end
 
     def load_request_envelopes
-      load_jsons(target_path)
+      load_jsons(@target_path)
     end
 
     def load_expected_responses
@@ -197,15 +197,15 @@ module Drntest
     end
 
     def expected_path
-      target_path.sub_ext(".expected")
+      @target_path.sub_ext(".expected")
     end
 
     def reject_path
-      target_path.sub_ext(".reject")
+      @target_path.sub_ext(".reject")
     end
 
     def actual_path
-      target_path.sub_ext(".actual")
+      @target_path.sub_ext(".actual")
     end
 
     def remove_reject_file
