@@ -71,6 +71,9 @@ module Drntest
 
         parser.on("--test=PATTERN",
                   "Run only tests which have a name matched to the given PATTERN") do |pattern|
+          if pattern =~ /\A\/.+\/\z/
+            pattern = Regexp.new(pattern[1..-2])
+          end
           tester.pattern = pattern
         end
 
@@ -128,13 +131,8 @@ module Drntest
       end
 
       unless @pattern.nil?
-        if @pattern =~ /\A\/.+\/\z/
-          matcher = Regexp.new(@pattern[1..-2])
-        else
-          matcher = @pattern
-        end
         tests.select! do |test|
-          matcher === test.basename(".test").to_s
+          @pattern === test.basename(".test").to_s
         end
       end
 
