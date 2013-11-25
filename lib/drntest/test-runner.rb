@@ -34,11 +34,6 @@ module Drntest
     def run
       print "#{target_path}: "
       prepare
-      print "  host   : #{host}"
-      print "  port   : #{port}"
-      print "  tag    : #{tag}"
-      print "  config : #{config}"
-      print "  catalog: #{config}"
       setup
       results = process_requests
       teardown
