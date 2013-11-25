@@ -130,14 +130,12 @@ module Drntest
       unless @pattern.nil?
         if @pattern =~ /\A\/.+\/\z/
           matcher = Regexp.new(@pattern[1..-2])
-          tests.select! do |test|
-            test.basename(".test").to_s =~ matcher
-          end
         else
-          tests.select! do |test|
-            test.basename(".test").to_s == @pattern
-          end
+          matcher = @pattern
         end
+          tests.select! do |test|
+            matcher === test.basename(".test").to_s
+          end
       end
 
       tests
