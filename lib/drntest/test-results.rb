@@ -24,9 +24,9 @@ module Drntest
     end
 
     def status
-      unless actuals.empty?
-        unless expecteds.empty?
-          if actuals == expecteds
+      unless @actuals.empty?
+        unless @expecteds.empty?
+          if @actuals == @expecteds
             :success
           else
             :failure
