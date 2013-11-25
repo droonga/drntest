@@ -28,15 +28,51 @@ module Drntest
     def initialize(tester, target)
       @tester = tester
       @target_path = Pathname(target)
+      prepare
     end
 
     def run
       print "#{target_path}: "
-      options = load_options
-      process_requests
+      setup
+      results = process_requests
+      teardown
+      results
     end
 
     private
+    def prepare
+      options = load_options
+
+      @config_dir = target_path.parent
+      @config_file = config_dir + "fluentd.conf"
+      @catalog_file = config_dir + "catalog.json"
+
+      if options[:CONFIG]
+        @config_file = Pathname(options[:CONFIG])
+        if @config_file.directory?
+          @config_dir = config_file
+          @config_file = config_dir + "fluentd.conf"
+          @catalog_file = config_dir + "catalog.json"
+        end
+      end
+
+      if options[:CATALOG]
+        @catalog_file = Pathname(options[:CATALOG])
+      end
+    end
+
+    def setup
+      FileUtils.rm_rf(temporary_dir.to_s)
+    end
+
+    def teardown
+      FileUtils.rm_rf(temporary_dir.to_s)
+    end
+
+    def temporary_dir
+      @config_dir + "tmp"
+    end
+
     def process_requests
       results = TestResults.new(target_path.to_s)
 
