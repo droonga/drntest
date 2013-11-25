@@ -186,7 +186,7 @@ module Drntest
       end
       pathname.read.each_line do |line|
         unless line[0] == "#"
-          parser << line 
+          parser << line
         end
       end
       json_objects
