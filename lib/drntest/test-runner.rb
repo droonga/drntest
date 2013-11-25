@@ -106,7 +106,7 @@ module Drntest
       temporary_catalog = temporary_dir + "catalog.json"
       FileUtils.cp(catalog, temporary_catalog)
 
-      engine_command = "fluentd --config #{temporary_config}"
+      engine_command = "#{@owner.fluentd} --config #{temporary_config}"
       engine_env = {
         "DROONGA_CATALOG" => temporary_catalog.to_s,
       }
