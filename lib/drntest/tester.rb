@@ -63,6 +63,12 @@ module Drntest
           tester.catalog = catalog
         end
 
+        parser.on("--fluentd=PATH",
+                  "Path to the fluentd executable",
+                  "(#{tester.fluentd})") do |tag|
+          tester.tag = tag
+        end
+
         parser.on("--testcase=PATTERN",
                   "Run only testcases which have a name matched to the given PATTERN") do |pattern|
           tester.pattern = pattern
@@ -72,7 +78,7 @@ module Drntest
       end
     end
 
-    attr_accessor :port, :host, :tag, :pattern, :config, :catalog
+    attr_accessor :port, :host, :tag, :fluentd, :pattern, :config, :catalog
 
     def initialize
       @port = 24224
@@ -80,6 +86,7 @@ module Drntest
       @tag  = "droonga"
       @config  = nil
       @catalog = nil
+      @fluentd = `which fluentd`
       @pattern = nil
     end
 
