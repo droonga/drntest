@@ -106,7 +106,11 @@ module Drntest
       temporary_catalog = temporary_dir + "catalog.json"
       FileUtils.cp(catalog, temporary_catalog)
 
-      engine_command = "#{@owner.fluentd} --config #{temporary_config}"
+      engine_command = [
+        @owner.fluentd,
+        "--config", temporary_config.to_s,
+        *@owner.fluentd_options,
+      ]
       engine_env = {
         "RUBYOPT" => nil,
         "BUNDLE_GEMFILE" => nil,
@@ -116,7 +120,9 @@ module Drntest
         :chdir => temporary_dir.to_s,
         STDERR => STDOUT,
       }
-      @engine_pid = Process.spawn(engine_env, engine_command, engine_options)
+      arguments = [engine_env, *engine_command]
+      arguments << engine_options
+      @engine_pid = Process.spawn(*arguments)
     end
 
     def teardown

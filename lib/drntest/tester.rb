@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+require "shellwords"
 require "optparse"
 require "drntest/version"
 require "drntest/test-runner"
@@ -69,6 +70,12 @@ module Drntest
           tester.fluentd = fluentd
         end
 
+        parser.on("--fluentd-options=OPTIONS",
+                  "Options for fluentd",
+                  "You can specify this option multiple times") do |options|
+          tester.fluentd_options.concat(Shellwords.split(options))
+        end
+
         parser.on("--test=PATTERN",
                   "Run only tests which have a name matched to the given PATTERN") do |pattern|
           if /\A\/(.+)\/\z/ =~ pattern
@@ -81,7 +88,8 @@ module Drntest
       end
     end
 
-    attr_accessor :port, :host, :tag, :fluentd, :pattern, :config, :catalog
+    attr_accessor :port, :host, :tag, :fluentd, :fluentd_options
+    attr_accessor :pattern, :config, :catalog
 
     def initialize
       @port = 24224
@@ -90,6 +98,7 @@ module Drntest
       @config  = nil
       @catalog = nil
       @fluentd = "fluentd"
+      @fluetnd_options = []
       @pattern = nil
     end
 
