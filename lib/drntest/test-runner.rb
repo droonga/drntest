@@ -66,23 +66,23 @@ module Drntest
     end
 
     def port
-      @port || @config[:port] || tester.port
+      @port || @config[:port] || @owner.port
     end
 
     def host
-      @host || @config[:host] || tester.host
+      @host || @config[:host] || @owner.host
     end
 
     def tag
-      @tag || @config[:tag] || tester.tag
+      @tag || @config[:tag] || @owner.tag
     end
 
     private
     def prepare
-      self.config = owner.config if owner.config
+      self.config = @owner.config if @owner.config
       self.config = @options[:config] if @options[:config]
 
-      @catalog = owner.catalog if owner.catalog
+      @catalog = @owner.catalog if @owner.catalog
       @catalog = @options[:catalog] if @options[:catalog]
 
       if catalog && catalog.exist?
