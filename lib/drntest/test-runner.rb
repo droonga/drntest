@@ -16,7 +16,7 @@
 require "json"
 require "tempfile"
 require "pp"
-require "drntest/test-result"
+require "drntest/test-results"
 require "drntest/executor"
 require "fileutils"
 
@@ -30,18 +30,15 @@ module Drntest
     end
 
     def run
-      result = TestResult.new(target_path.to_s)
-
       print "#{target_path}: "
-      request_envelope = load_request_envelope
-      executor = Executor.new(tester, request_envelope)
-      result.actual = executor.execute
-
-      if expected_exist?
-        result.expected = load_expected
+      results = TestResults.new(target_path.to_s)
+      each_request do |request, expected|
+        executor = Executor.new(tester, request)
+        actual = executor.execute
+        results.add(actual, expected)
       end
 
-      case result.status
+      case results.status
       when :success
         puts "SUCCESS"
         remove_reject_file
@@ -49,23 +46,42 @@ module Drntest
         puts "NO RESPONSE"
       when :failure
         puts "FAILURE"
-        output_reject_file(result.actual)
-        show_diff(result.expected, result.actual)
+        output_reject_file(results.actuals)
+        show_diff(results.expecteds, results.actuals)
       when :not_checked
         puts "NOT CHECKED"
-        output_actual_file(result.actual)
+        output_actual_file(results.actuals)
       end
 
-      result
+      results
     end
 
     private
-    def load_request_envelope
-      JSON.parse(target_path.read)
+    def each_request(&block)
+      requests = load_request_envelopes
+      expecteds = load_expected_responses
+      requests.each_with_index do |request, index|
+        expected = expecteds[index]
+        yield request, expected
+      end
     end
 
-    def load_expected
-      JSON.parse(expected_path.read)
+    def load_request_envelopes
+      load_jsons(target_path)
+    end
+
+    def load_expected_responses
+      load_jsons(expected_path)
+    end
+
+    def load_jsons(pathname, options={})
+      parser = Yajl::Parser.new(options)
+      json_objects = []
+      parser.on_parse_complete = Proc.new do |json_object|
+        json_objects << json_object
+      end
+      parser << pathname.read
+      json_objects
     end
 
     def expected_exist?
@@ -88,25 +104,31 @@ module Drntest
       FileUtils.rm_rf(reject_path, :secure => true)
     end
 
-    def output_reject_file(actual_result)
-      output_actual_result(actual_result, reject_path)
+    def output_reject_file(results)
+      output_results(results, reject_path)
     end
 
-    def output_actual_file(actual_result)
-      output_actual_result(actual_result, actual_path)
+    def output_actual_file(results)
+      output_results(results, actual_path)
     end
 
-    def output_actual_result(actual_result, output_path)
-      puts "Saving received result as #{output_path}"
-      actual_json = JSON.pretty_generate(actual_result)
+    def output_results(results, output_path)
+      puts "Saving received results as #{output_path}"
       File.open(output_path, "w") do |file|
-        file.puts(actual_json)
+        results.each do |result|
+          json = JSON.pretty_generate(result)
+          file.puts(json)
+        end
       end
     end
 
-    def show_diff(expected, actual)
-      expected_pretty = JSON.pretty_generate(expected)
-      actual_pretty = JSON.pretty_generate(actual)
+    def show_diff(expecteds, actuals)
+      expected_pretty = expecteds.collect do |expected|
+        JSON.pretty_generate(expected)
+      end.join("\n")
+      actual_pretty = actuals.collect do |actual|
+        JSON.pretty_generate(actual)
+      end.join("\n")
 
       create_temporary_file("expected", expected_pretty) do |expected_file|
         create_temporary_file("actual", actual_pretty) do |actual_file|
