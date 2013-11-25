@@ -50,7 +50,12 @@ module Drntest
 
     def normalize_body!(normalized_result)
       return unless groonga_command?
-      normalize_groonga_command_result!(normalized_result[2])
+      begin
+        normalize_groonga_command_result!(normalized_result[2])
+      rescue StandardError => error
+        p error
+        normalized_result
+      end
     end
 
     GROONGA_COMMANDS = [
