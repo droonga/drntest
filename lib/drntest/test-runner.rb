@@ -85,7 +85,7 @@ module Drntest
       @catalog = owner.catalog if owner.catalog
       @catalog = @options[:catalog] if @options[:catalog]
 
-      if catalog.exist?
+      if catalog && catalog.exist?
         catalog_json = JSON.parse(catalog.read, :symbolize_names => true)
         zone = catalog_json[:zones].first
         /\A([^:]+):(\d+)\/(.+)\z/ =~ zone
