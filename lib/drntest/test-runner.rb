@@ -84,9 +84,20 @@ module Drntest
       FileUtils.cp(config_file, temporary_config)
       temporary_catalog = temporary_dir + "catalog.json"
       FileUtils.cp(catalog_file, temporary_catalog)
+
+      engine_command = "fluentd --config #{temporary_config}"
+      engine_env = {
+        "DROONGA_CATALOG" => temporary_catalog,
+      }
+      engine_options = {
+        :chdir => temporary_dir,
+        STDERR => STDOUT,
+      }
+      @engine_pid = Process.spawn(engine_env, engine_command, engine_options)
     end
 
     def teardown
+      Process.kill(:KILL, @engine_pid)
       FileUtils.rm_rf(temporary_dir.to_s)
     end
 
