@@ -41,12 +41,12 @@ module Drntest
     end
 
     def config_dir
-      return @config.parent if @config
-      @target_path.parent
+      return nil unless @config
+      @config.parent
     end
 
     def config
-      @config || @config_dir + "fluentd.conf"
+      @config
     end
 
     def config=(path)
@@ -56,7 +56,13 @@ module Drntest
     end
 
     def catalog
-      @catalog || @config_dir + "catalog.json"
+      path = @catalog
+      path ||= config_dir + "catalog.json" if config_dir
+      if path
+        Pathname(path)
+      else
+        nil
+      end
     end
 
     def port
@@ -74,27 +80,24 @@ module Drntest
     private
     def prepare
       self.config = owner.config if owner.config
-      @catalog = Pathname(owner.catalog) if owner.catalog
-
       self.config = @options[:config] if @options[:config]
-      @catalog = Pathname(@options[:catalog]) if @options[:catalog]
 
-      unless config.exist?
-        raise "Missing config file: #{config.to_s}"
-      end
-      unless catalog.exist?
-        raise "Missing catalog file: #{catalog.to_s}"
-      end
+      @catalog = owner.catalog if owner.catalog
+      @catalog = @options[:catalog] if @options[:catalog]
 
-      catalog_json = JSON.parse(catalog.read, :symbolize_names => true)
-      zone = catalog_json[:zones].first
-      /\A([^:]+):(\d+)/(.+)\z/ =~ zone
-      # @host = $1
-      @port = $2.to_i
-      @tag  = $3
+      if catalog.exist?
+        catalog_json = JSON.parse(catalog.read, :symbolize_names => true)
+        zone = catalog_json[:zones].first
+        /\A([^:]+):(\d+)/(.+)\z/ =~ zone
+        @host = "localhost" # $1
+        @port = $2.to_i
+        @tag  = $3
+      end
     end
 
     def setup
+      return unless temporary_engine?
+
       FileUtils.rm_rf(temporary_dir)
       FileUtils.mkdir_p(temporary_dir)
 
@@ -115,12 +118,18 @@ module Drntest
     end
 
     def teardown
+      return unless temporary_engine?
+
       Process.kill(:KILL, @engine_pid)
       FileUtils.rm_rf(temporary_dir.to_s)
     end
 
     def temporary_dir
       config_dir + "tmp"
+    end
+
+    def temporary_engine?
+      config && config.exist?
     end
 
     def process_requests
