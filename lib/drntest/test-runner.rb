@@ -23,7 +23,7 @@ require "fileutils"
 
 module Drntest
   class TestRunner
-    attr_reader :tester, :target_path, :config_dir, :config_file, :catalog_file
+    attr_reader :tester, :target_path
 
     def initialize(tester, target)
       @tester = tester
@@ -40,17 +40,22 @@ module Drntest
     end
 
     def config_dir
-      return @config_dir if @config_dir
       return @config_file.parent if @config_file
-      target_path.parent
+      @target_path.parent
     end
 
-    def config_dir=(path)
-      @config_dir = Pathname(path)
+    def config_file
+      @config_file || @config_dir + "fluentd.conf"
     end
 
     def config_file=(path)
-      @config_file = Pathname(path)
+      path = Pathname(path)
+      path += "fluentd.conf" if path.directory?
+      @config_file = path
+    end
+
+    def catalog_file
+      @catalog_file || @config_dir + "catalog.json"
     end
 
     def catalog_file=(path)
@@ -60,25 +65,18 @@ module Drntest
     private
     def prepare
       options = load_options
-
-      @config_file ||= config_dir + "fluentd.conf"
-      @catalog_file ||= config_dir + "catalog.json"
-
-      if options[:CONFIG]
-        @config_file = Pathname(options[:CONFIG])
-        if @config_file.directory?
-          @config_dir = config_file
-          @config_file = config_dir + "fluentd.conf"
-          @catalog_file = config_dir + "catalog.json"
-        end
-      end
-
-      if options[:CATALOG]
-        @catalog_file = Pathname(options[:CATALOG])
-      end
+      self.catalog_file = Pathname(options[:CONFIG]) if options[:CONFIG]
+      self.catalog_file = Pathname(options[:CATALOG]) if options[:CATALOG]
     end
 
     def setup
+      unless config_file.exist?
+        raise "Missing config file: #{config_file.to_s}"
+      end
+      unless catalog_file.exist?
+        raise "Missing catalog file: #{catalog_file.to_s}"
+      end
+
       FileUtils.rm_rf(temporary_dir.to_s)
     end
 
