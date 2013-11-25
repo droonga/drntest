@@ -108,10 +108,10 @@ module Drntest
 
       engine_command = "fluentd --config #{temporary_config}"
       engine_env = {
-        "DROONGA_CATALOG" => temporary_catalog,
+        "DROONGA_CATALOG" => temporary_catalog.to_s,
       }
       engine_options = {
-        :chdir => temporary_dir,
+        :chdir => temporary_dir.to_s,
         STDERR => STDOUT,
       }
       @engine_pid = Process.spawn(engine_env, engine_command, engine_options)
