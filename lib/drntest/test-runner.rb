@@ -64,8 +64,8 @@ module Drntest
 
     private
     def prepare
-      self.config_file = tester.config
-      self.catalog_file = tester.catalog
+      self.config_file = tester.config if tester.config
+      self.catalog_file = tester.catalog if tester.catalog
 
       options = load_options
       self.config_file = Pathname(options[:config]) if options[:config]
