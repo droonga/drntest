@@ -69,8 +69,8 @@ module Drntest
           tester.fluentd = fluentd
         end
 
-        parser.on("--testcase=PATTERN",
-                  "Run only testcases which have a name matched to the given PATTERN") do |pattern|
+        parser.on("--test=PATTERN",
+                  "Run only tests which have a name matched to the given PATTERN") do |pattern|
           tester.pattern = pattern
         end
 
