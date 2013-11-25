@@ -33,10 +33,12 @@ module Drntest
     def run
       print "#{target_path}: "
       results = TestResults.new(target_path.to_s)
-      each_request do |request, expected|
+      load_request_envelopes.each do |request|
         executor = Executor.new(tester, request)
-        actual = executor.execute
-        results.add(actual, expected)
+        results.actuals << executor.execute
+      end
+      if expected_exist?
+        results.expecteds = load_expected_responses
       end
 
       case results.status
@@ -58,15 +60,6 @@ module Drntest
     end
 
     private
-    def each_request(&block)
-      requests = load_request_envelopes
-      expecteds = load_expected_responses
-      requests.each_with_index do |request, index|
-        expected = expecteds[index]
-        yield request, expected
-      end
-    end
-
     def load_request_envelopes
       load_jsons(target_path)
     end
