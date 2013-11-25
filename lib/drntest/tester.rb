@@ -53,6 +53,16 @@ module Drntest
           tester.tag = tag
         end
 
+        parser.on("--config=PATH",
+                  "Path to the default configuration file of droonga engine" do |config|
+          tester.config = config
+        end
+
+        parser.on("--catalog=PATH",
+                  "Path to the default catalog file of droonga engine" do |catalog|
+          tester.catalog = catalog
+        end
+
         parser.on("--testcase=PATTERN",
                   "Run only testcases which have a name matched to the given PATTERN") do |pattern|
           tester.pattern = pattern
@@ -62,12 +72,14 @@ module Drntest
       end
     end
 
-    attr_accessor :port, :host, :tag, :pattern
+    attr_accessor :port, :host, :tag, :pattern, :config, :catalog
 
     def initialize
       @port = 24224
       @host = "localhost"
       @tag  = "droonga"
+      @config  = nil
+      @catalog = nil
       @pattern = nil
     end
 
@@ -76,6 +88,8 @@ module Drntest
       tests = load_tests(*targets)
       tests.each do |test|
         test_runner = TestRunner.new(self, test)
+        test_runner.config = @config
+        test_runner.catalog = @catalog
         test_suites_result.test_results << test_runner.run
       end
 
