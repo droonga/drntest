@@ -13,28 +13,42 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-module Drntest
-  class TestResult
-    attr_accessor :expected, :actual
+require "drntest/test-result"
 
-    def initialize
-      @expected = nil
-      @actual = nil
+module Drntest
+  class TestResults
+    attr_accessor :name
+
+    def initialize(name)
+      @name = name
+      @results = []
+    end
+
+    def add(expected, actual)
+      result = TestResult.new
+      result.actual = actual
+      result.expected = expected
+      @results << result
     end
 
     def status
-      if @actual
-        if @expected
-          if @actual == @expected
-            :success
-          else
-            :failure
-          end
-        else
-          :not_checked
+      @results.each do |result|
+        unless result.status == :success
+          return result.status
         end
-      else
-        :no_response
+      end
+      :success
+    end
+
+    def expecteds
+      @results.collect do |result|
+        result.expected
+      end
+    end
+
+    def actuals
+      @results.collect do |result|
+        result.actual
       end
     end
   end
