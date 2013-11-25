@@ -164,7 +164,7 @@ module Drntest
     def load_options
       options = {}
       target_path.read.each_line do |line|
-        next unless /\A#@([^\s]+)\s+(.+)\z/ =~ line
+        next unless /\A\#\@([^\s]+)\s+(.+)\z/ =~ line
         options[$1.to_sym] = $2
       end
       options
