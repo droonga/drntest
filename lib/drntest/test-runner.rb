@@ -59,10 +59,6 @@ module Drntest
       @catalog || @config_dir + "catalog.json"
     end
 
-    def catalog=(path)
-      @catalog = Pathname(path)
-    end
-
     def port
       @port || @config[:port] || tester.port
     end
@@ -78,13 +74,11 @@ module Drntest
     private
     def prepare
       self.config = owner.config if owner.config
-      self.catalog = owner.catalog if owner.catalog
+      @catalog = Pathname(owner.catalog) if owner.catalog
 
-      self.config = Pathname(@options[:config]) if @options[:config]
-      self.catalog = Pathname(@options[:catalog]) if @options[:catalog]
-    end
+      self.config = @options[:config] if @options[:config]
+      @catalog = Pathname(@options[:catalog]) if @options[:catalog]
 
-    def setup
       unless config.exist?
         raise "Missing config file: #{config.to_s}"
       end
@@ -92,6 +86,15 @@ module Drntest
         raise "Missing catalog file: #{catalog.to_s}"
       end
 
+      catalog_json = JSON.parse(catalog.read, :symbolize_names => true)
+      zone = catalog_json[:zones].first
+      /\A([^:]+):(\d+)/(.+)\z/ =~ zone
+      # @host = $1
+      @port = $2.to_i
+      @tag  = $3
+    end
+
+    def setup
       FileUtils.rm_rf(temporary_dir)
       FileUtils.mkdir_p(temporary_dir)
 
