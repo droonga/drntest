@@ -65,8 +65,8 @@ module Drntest
     private
     def prepare
       options = load_options
-      self.config_file = Pathname(options[:CONFIG]) if options[:CONFIG]
-      self.catalog_file = Pathname(options[:CATALOG]) if options[:CATALOG]
+      self.config_file = Pathname(options[:config]) if options[:config]
+      self.catalog_file = Pathname(options[:catalog]) if options[:catalog]
     end
 
     def setup
@@ -126,8 +126,8 @@ module Drntest
     def load_options
       options = {}
       target_path.read.each_line do |line|
-        next unless /\A#([^\s]+)\s+(.+)\z/ =~ line
-        options[$1] = $2
+        next unless /\A#@([^\s]+)\s+(.+)\z/ =~ line
+        options[$1.to_sym] = $2
       end
       options
     end
