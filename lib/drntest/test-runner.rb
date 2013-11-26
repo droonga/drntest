@@ -128,7 +128,7 @@ module Drntest
     def teardown
       return unless temporary_engine?
 
-      Process.kill(:KILL, @engine_pid)
+      Process.kill(:TERM, @engine_pid)
       FileUtils.rm_rf(temporary_dir.to_s)
     end
 
