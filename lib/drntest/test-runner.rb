@@ -28,7 +28,7 @@ module Drntest
     def initialize(owner, target)
       @owner = owner
       @target_path = Pathname(target)
-      @options = load_options
+      @options = load_options(target)
     end
 
     def run
@@ -192,13 +192,24 @@ module Drntest
       results
     end
 
-    def load_options
+    def load_options(path, options={})
       options = {}
-      @target_path.read.each_line do |line|
+      Pathname(path).read.each_line do |line|
         next unless /\A\#\@([^\s]+)\s+(.+)\n?\z/ =~ line
         key = $1.to_sym
-        options[key] ||= []
-        options[key] << $2
+        value = $2
+        if key == :include
+          included = resolve_relative_path(value, options[:base_path] || base_path)
+          included_options = load_options(included,
+                                          options.merge(:base_path => included))
+          included_options.each do |key, values|
+            options[key] ||= []
+            options[key] += values
+          end
+        else
+          options[key] ||= []
+          options[key] << value
+        end
       end
       options
     end
