@@ -43,6 +43,10 @@ module Drntest
       results
     end
 
+    def base_path
+      @target_path.parent
+    end
+
     def config_dir
       return nil unless @config
       @config.parent
@@ -53,7 +57,7 @@ module Drntest
     end
 
     def config=(path)
-      path = Pathname(path).expand_path(@target_path.parent)
+      path = Pathname(path).expand_path(base_path)
       path += "fluentd.conf" if path.directory?
       @config = path
     end
@@ -62,7 +66,7 @@ module Drntest
       path = @catalog
       path ||= config_dir + "catalog.json" if config_dir
       if path
-        Pathname(path).expand_path(@target_path.parent)
+        Pathname(path).expand_path(base_path)
       else
         nil
       end
@@ -201,14 +205,22 @@ module Drntest
       load_jsons(expected_path)
     end
 
-    def load_jsons(pathname, options={})
-      parser = Yajl::Parser.new(options)
+    def load_jsons(path, options={})
+      parser = Yajl::Parser.new
       json_objects = []
       parser.on_parse_complete = Proc.new do |json_object|
         json_objects << json_object
       end
-      pathname.read.each_line do |line|
-        unless line[0] == "#"
+      Pathname(path).read.each_line do |line|
+        if line[0] == "#"
+          if /\A\#\@include\s+(.+)\n?\z/ =~ line
+            included = $1
+            included = Pathname(included)
+            included = included.expand_path(options[:base_path] || base_path)
+            json_objects += load_jsons(included,
+                                       options.merge(:base_path => included))
+          end
+        else
           parser << line
         end
       end
