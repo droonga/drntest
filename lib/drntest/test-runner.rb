@@ -69,24 +69,30 @@ module Drntest
     end
 
     def port
-      @port || @options[:port] || @owner.port
+      return @port if @port
+      return @options[:port].last if @options[:port]
+      @owner.port
     end
 
     def host
-      @host || @options[:host] || @owner.host
+      return @host if @host
+      return @options[:host].last if @options[:host]
+      @owner.host
     end
 
     def tag
-      @tag || @options[:tag] || @owner.tag
+      return @tag if @tag
+      return @options[:tag].last if @options[:tag]
+      @owner.tag
     end
 
     private
     def prepare
       self.config = @owner.config if @owner.config
-      self.config = @options[:config] if @options[:config]
+      self.config = @options[:config].last if @options[:config]
 
       @catalog = @owner.catalog if @owner.catalog
-      @catalog = @options[:catalog] if @options[:catalog]
+      @catalog = @options[:catalog].last if @options[:catalog]
 
       if catalog && catalog.exist?
         catalog_json = JSON.parse(catalog.read, :symbolize_names => true)
@@ -180,7 +186,9 @@ module Drntest
       options = {}
       @target_path.read.each_line do |line|
         next unless /\A\#\@([^\s]+)\s+(.+)\n?\z/ =~ line
-        options[$1.to_sym] = $2
+        key = $1.to_sym
+        options[key] ||= []
+        options[key] << $2
       end
       options
     end
