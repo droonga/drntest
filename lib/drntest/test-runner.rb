@@ -168,7 +168,12 @@ module Drntest
 
       load_request_envelopes.each do |request|
         executor = Executor.new(self, request)
-        results.actuals << executor.execute
+        response = executor.execute
+        if request.include?("replyTo") && request["replyTo"].nil?
+          # don't assert responses of included requests!
+        else
+          results.actuals << response
+        end
       end
       if expected_exist?
         results.expecteds = load_expected_responses
@@ -232,8 +237,14 @@ module Drntest
         if line[0] == "#"
           if /\A\#\@include\s+(.+)\n?\z/ =~ line
             included = resolve_relative_path($1, options[:base_path] || base_path)
-            json_objects += load_jsons(included,
-                                       options.merge(:base_path => included))
+            included_jsons = load_jsons(included,
+                                        options.merge(:base_path => included))
+            included_jsons.collect! do |envelope|
+              # don't assert responses of included requests!
+              envelope["replyTo"] = nil
+              envelope
+            end
+            json_objects += included_jsons
           end
         else
           parser << line
