@@ -129,6 +129,8 @@ module Drntest
       return unless temporary_engine?
 
       Process.kill(:TERM, @engine_pid)
+      Process.wait(@engine_pid)
+
       FileUtils.rm_rf(temporary_dir.to_s)
     end
 
