@@ -35,8 +35,11 @@ module Drntest
       print "#{@target_path}: "
       prepare
       setup
-      results = process_requests
-      teardown
+      begin
+        results = process_requests
+      ensure
+        teardown
+      end
       results
     end
 
