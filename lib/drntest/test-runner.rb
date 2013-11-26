@@ -57,7 +57,7 @@ module Drntest
     end
 
     def config=(path)
-      path = Pathname(path).expand_path(base_path)
+      path = resolve_relative_path(path, base_path)
       path += "fluentd.conf" if path.directory?
       @config = path
     end
@@ -66,7 +66,7 @@ module Drntest
       path = @catalog
       path ||= config_dir + "catalog.json" if config_dir
       if path
-        Pathname(path).expand_path(base_path)
+        resolve_relative_path(path, base_path)
       else
         nil
       end
@@ -91,6 +91,12 @@ module Drntest
     end
 
     private
+    def resolve_relative_path(path, base_path)
+      path = path.to_s
+      path = path[2..-1] if path[0..1] == "./"
+      Pathname(path).expand_path(base_path)
+    end
+
     def prepare
       self.config = @owner.config if @owner.config
       self.config = @options[:config].last if @options[:config]
@@ -214,9 +220,7 @@ module Drntest
       Pathname(path).read.each_line do |line|
         if line[0] == "#"
           if /\A\#\@include\s+(.+)\n?\z/ =~ line
-            included = $1
-            included = Pathname(included)
-            included = included.expand_path(options[:base_path] || base_path)
+            included = resolve_relative_path($1, options[:base_path] || base_path)
             json_objects += load_jsons(included,
                                        options.merge(:base_path => included))
           end
