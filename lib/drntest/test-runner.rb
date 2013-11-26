@@ -123,6 +123,8 @@ module Drntest
       arguments = [engine_env, *engine_command]
       arguments << engine_options
       @engine_pid = Process.spawn(*arguments)
+
+      wait_until_engine_ready
     end
 
     def teardown
@@ -265,6 +267,22 @@ module Drntest
       file.write(content)
       file.close
       yield(file)
+    end
+
+    def engine_ready?
+      begin
+        socket = TCPSocket.new(@host, @port)
+        socket.close
+        true
+      rescue Errno::ECONNREFUSED
+        false
+      end
+    end
+
+    def wait_until_engine_ready
+      until engine_ready?
+        sleep 1
+      end
     end
   end
 end
