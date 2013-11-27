@@ -63,7 +63,8 @@ module Drntest
         end
 
         parser.on("--config=NAME",
-                  "Name of the configuration directory for Droonga engine") do |config|
+                  "Name of the configuration directory for Droonga engine",
+                  "(#{tester.config})") do |config|
           tester.config = config
         end
 
@@ -99,7 +100,7 @@ module Drntest
       @host = "localhost"
       @tag  = "droonga"
       @base_path = Pathname(File.dirname(__FILE__))
-      @config  = nil
+      @config  = "default"
       @fluentd = "fluentd"
       @fluentd_options = []
       @pattern = nil
