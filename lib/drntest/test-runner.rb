@@ -200,9 +200,10 @@ module Drntest
     def load_options(path, options={})
       options = {}
       Pathname(path).read.each_line do |line|
-        next unless /\A\#\@([^\s]+)\s+(.+)\n?\z/ =~ line
+        next unless /\A\#\@([^\s]+)(?:\s+(.+))?\n?\z/ =~ line
         key = $1.to_sym
-        value = $2
+        # nil value means that it is a boolean option.
+        value = $2 || true
         if key == :include
           included = resolve_relative_path(value, options[:base_path] || base_path)
           included_options = load_options(included,
