@@ -166,14 +166,19 @@ module Drntest
     def process_requests
       results = TestResults.new(@target_path)
 
+      logging = true
       load_request_envelopes.each do |request|
+        case request
+        when :enable_logging
+          logging = true
+          next
+        when :disable_logging
+          logging = false
+          next
+        end
         executor = Executor.new(self, request)
         response = executor.execute
-        if request.include?("replyTo") && request["replyTo"].nil?
-          # don't assert responses of included requests!
-        else
-          results.actuals << response
-        end
+        results.actuals << response if logging
       end
       if expected_exist?
         results.expecteds = load_expected_responses
@@ -203,7 +208,7 @@ module Drntest
       options = {}
       Pathname(path).read.each_line do |line|
         next unless OPTION_MATCHER =~ line
-        key = $1.to_sym
+        key = $1.gsub(/-/, "_").to_sym
         # nil value means that it is a boolean option.
         value = $2 || true
         if key == :include
@@ -239,19 +244,18 @@ module Drntest
       Pathname(path).read.each_line do |line|
         if line[0] == "#"
           if OPTION_MATCHER =~ line
-            key = $1.to_sym
+            key = $1.gsub(/-/, "_").to_sym
             value = $2
             case key
             when :include
               included = resolve_relative_path(value, options[:base_path] || base_path)
               included_jsons = load_jsons(included,
                                           options.merge(:base_path => included))
-              included_jsons.collect! do |envelope|
-                # don't assert responses of included requests!
-                envelope["replyTo"] = nil
-                envelope
-              end
               json_objects += included_jsons
+            when :enable_logging
+              json_objects << key
+            when :disable_logging
+              json_objects << key
             end
           end
         else
