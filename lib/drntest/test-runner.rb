@@ -183,18 +183,18 @@ module Drntest
     end
 
     class Directive
-      MATCHER = /\A\#\@([^\s]+)(?:\s+(.+))?\n?\z/.freeze
+      MATCHER = /\A\#\@([^\s]+)(?:\s+(.+))?\z/.freeze
 
       class << self
         def directive?(source)
-          MATCHER =~ source
+          MATCHER =~ source.strip
         end
       end
 
       attr_reader :type, :value
 
       def initialize(source)
-        MATCHER =~ source
+        MATCHER =~ source.strip
         @value = $2
         @type = $1.gsub("-", "_").to_sym
       end
