@@ -15,6 +15,7 @@
 
 require "shellwords"
 require "optparse"
+require "pathname"
 require "drntest/version"
 require "drntest/test-runner"
 require "drntest/test-suites-result"
@@ -27,6 +28,7 @@ module Drntest
         tester = new
         option_parser = create_option_parser(tester)
         targets = option_parser.parse!(argv)
+        targets << base + "suite" if targets.empty?
         tester.run(*targets)
       end
 
@@ -57,7 +59,7 @@ module Drntest
         parser.on("--base=PATH",
                   "Path to the base directory including test suite, config and fixture",
                   "(#{tester.base_path})") do |base_path|
-          tester.base_path = base_path
+          tester.base_path = Pathname(base_path)
         end
 
         parser.on("--config=NAME",
@@ -96,7 +98,7 @@ module Drntest
       @port = 24224
       @host = "localhost"
       @tag  = "droonga"
-      @base_path = File.dirname(__FILE__)
+      @base_path = Pathname(File.dirname(__FILE__))
       @config  = nil
       @fluentd = "fluentd"
       @fluentd_options = []
