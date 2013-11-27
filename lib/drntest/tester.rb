@@ -28,7 +28,7 @@ module Drntest
         tester = new
         option_parser = create_option_parser(tester)
         targets = option_parser.parse!(argv)
-        targets << base + "suite" if targets.empty?
+        targets << base_path + "suite" if targets.empty?
         tester.run(*targets)
       end
 
