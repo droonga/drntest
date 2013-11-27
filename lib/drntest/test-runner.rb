@@ -23,12 +23,12 @@ require "fileutils"
 
 module Drntest
   class TestRunner
-    attr_reader :owner, :target_path
+    attr_reader :owner, :base_path, :target_path
 
     def initialize(owner, target)
       @owner = owner
+      @base_path = Pathname(owner.base_path)
       @target_path = Pathname(target)
-      @options = load_options(target)
     end
 
     def run
@@ -43,69 +43,40 @@ module Drntest
       results
     end
 
-    def base_path
-      @target_path.parent
-    end
-
     def config_dir
-      return nil unless @config
-      @config.parent
+      (base_path + "config") + @owner.config
     end
 
-    def config
-      @config
+    def config_file
+      config_dir + "fluentd.conf"
     end
 
-    def config=(path)
-      path = resolve_relative_path(path, base_path)
-      path += "fluentd.conf" if path.directory?
-      @config = path
-    end
-
-    def catalog
-      path = @catalog
-      path ||= config_dir + "catalog.json" if config_dir
-      if path
-        resolve_relative_path(path, base_path)
-      else
-        nil
-      end
+    def catalog_file
+      config_dir + "catalog.json"
     end
 
     def port
-      return @port if @port
-      return @options[:port].last if @options[:port]
       @owner.port
     end
 
     def host
-      return @host if @host
-      return @options[:host].last if @options[:host]
       @owner.host
     end
 
     def tag
-      return @tag if @tag
-      return @options[:tag].last if @options[:tag]
       @owner.tag
     end
 
     private
-    def resolve_relative_path(path, base_path)
+    def resolve_relative_path(path, base)
       path = path.to_s
       path = path[2..-1] if path[0..1] == "./"
-      Pathname(path).expand_path(base_path)
+      Pathname(path).expand_path(base)
     end
 
     def prepare
-      self.config = @owner.config if @owner.config
-      self.config = @options[:config].last if @options[:config]
-
-      @catalog = @owner.catalog if @owner.catalog
-      @catalog = @options[:catalog].last if @options[:catalog]
-
-      if catalog && catalog.exist?
-        catalog_json = JSON.parse(catalog.read, :symbolize_names => true)
+      if catalog_file.exist?
+        catalog_json = JSON.parse(catalog_file.read, :symbolize_names => true)
         zone = catalog_json[:zones].first
         /\A([^:]+):(\d+)\/(.+)\z/ =~ zone
         @host = "localhost" # $1
@@ -121,9 +92,9 @@ module Drntest
       FileUtils.mkdir_p(temporary_dir)
 
       temporary_config = temporary_dir + "fluentd.conf"
-      FileUtils.cp(config, temporary_config)
+      FileUtils.cp(config_file, temporary_config)
       temporary_catalog = temporary_dir + "catalog.json"
-      FileUtils.cp(catalog, temporary_catalog)
+      FileUtils.cp(catalog_file, temporary_catalog)
 
       engine_command = [
         @owner.fluentd,
@@ -160,7 +131,7 @@ module Drntest
     end
 
     def temporary_engine?
-      @owner.fluentd && config && config.exist?
+      @owner.fluentd && config_file.exist?
     end
 
     def process_requests
@@ -168,12 +139,13 @@ module Drntest
 
       logging = true
       load_request_envelopes.each do |request|
-        case request
-        when :enable_logging
-          logging = true
-          next
-        when :disable_logging
-          logging = false
+        if request.is_a?(Directive)
+          case request.type
+          when :enable_logging
+            logging = true
+          when :disable_logging
+            logging = false
+          end
           next
         end
         executor = Executor.new(self, request)
@@ -202,37 +174,30 @@ module Drntest
       results
     end
 
-    DIRECTIVE_MATCHER = /\A\#\@([^\s]+)(?:\s+(.+))?\n?\z/.freeze
-
-    def load_options(path, options={})
-      loaded_options = {}
-      Pathname(path).read.each_line do |line|
-        next unless DIRECTIVE_MATCHER =~ line
-        # nil value means that it is a boolean option.
-        value = $2 || true
-        key = $1.gsub("-", "_").to_sym
-        if key == :include
-          included = resolve_relative_path(value, options[:base_path] || base_path)
-          included_options = load_options(included,
-                                          options.merge(:base_path => included))
-          included_options.each do |key, values|
-            loaded_options[key] ||= []
-            loaded_options[key] += values
-          end
-        else
-          loaded_options[key] ||= []
-          loaded_options[key] << value
-        end
-      end
-      loaded_options
-    end
-
     def load_request_envelopes
       load_jsons(@target_path)
     end
 
     def load_expected_responses
       load_jsons(expected_path)
+    end
+
+    class Directive
+      MATCHER = /\A\#\@([^\s]+)(?:\s+(.+))?\n?\z/.freeze
+
+      class << self
+        def directive?(source)
+          MATCHER =~ source
+        end
+      end
+
+      attr_reader :type, :value
+
+      def initialize(source)
+        MATCHER =~ source
+        @value = $2
+        @type = $1.gsub("-", "_").to_sym
+      end
     end
 
     def load_jsons(path, options={})
@@ -243,19 +208,14 @@ module Drntest
       end
       Pathname(path).read.each_line do |line|
         if line[0] == "#"
-          if DIRECTIVE_MATCHER =~ line
-            value = $2
-            key = $1.gsub("-", "_").to_sym
-            case key
-            when :include
+          if Directive.directive?(line)
+            directive = Directive.new(line)
+            if directive.type == :include
               included = resolve_relative_path(value, options[:base_path] || base_path)
-              included_jsons = load_jsons(included,
-                                          options.merge(:base_path => included))
+              included_jsons = load_jsons(included)
               json_objects += included_jsons
-            when :enable_logging
-              json_objects << key
-            when :disable_logging
-              json_objects << key
+            else
+              json_objects << directive
             end
           end
         else

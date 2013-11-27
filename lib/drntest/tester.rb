@@ -54,14 +54,15 @@ module Drntest
           tester.tag = tag
         end
 
-        parser.on("--config=PATH",
-                  "Path to the default configuration file of Droonga engine") do |config|
-          tester.config = config
+        parser.on("--base=PATH",
+                  "Path to the base directory including test suite, config and fixture",
+                  "(#{tester.base_path})") do |base_path|
+          tester.base_path = base_path
         end
 
-        parser.on("--catalog=PATH",
-                  "Path to the default catalog file of Droonga engine") do |catalog|
-          tester.catalog = catalog
+        parser.on("--config=NAME",
+                  "Name of the configuration directory for Droonga engine") do |config|
+          tester.config = config
         end
 
         parser.on("--fluentd=PATH",
@@ -89,14 +90,14 @@ module Drntest
     end
 
     attr_accessor :port, :host, :tag, :fluentd, :fluentd_options
-    attr_accessor :pattern, :config, :catalog
+    attr_accessor :pattern, :base_path
 
     def initialize
       @port = 24224
       @host = "localhost"
       @tag  = "droonga"
+      @base_path = File.dirname(__FILE__)
       @config  = nil
-      @catalog = nil
       @fluentd = "fluentd"
       @fluentd_options = []
       @pattern = nil
