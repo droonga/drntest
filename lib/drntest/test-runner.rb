@@ -202,12 +202,12 @@ module Drntest
       results
     end
 
-    OPTION_MATCHER = /\A\#\@([^\s]+)(?:\s+(.+))?\n?\z/.freeze
+    DIRECTIVE_MATCHER = /\A\#\@([^\s]+)(?:\s+(.+))?\n?\z/.freeze
 
     def load_options(path, options={})
       options = {}
       Pathname(path).read.each_line do |line|
-        next unless OPTION_MATCHER =~ line
+        next unless DIRECTIVE_MATCHER =~ line
         key = $1.gsub(/-/, "_").to_sym
         # nil value means that it is a boolean option.
         value = $2 || true
@@ -243,7 +243,7 @@ module Drntest
       end
       Pathname(path).read.each_line do |line|
         if line[0] == "#"
-          if OPTION_MATCHER =~ line
+          if DIRECTIVE_MATCHER =~ line
             key = $1.gsub(/-/, "_").to_sym
             value = $2
             case key
