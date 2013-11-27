@@ -208,9 +208,9 @@ module Drntest
       loaded_options = {}
       Pathname(path).read.each_line do |line|
         next unless DIRECTIVE_MATCHER =~ line
-        key = $1.gsub("-", "_").to_sym
         # nil value means that it is a boolean option.
         value = $2 || true
+        key = $1.gsub("-", "_").to_sym
         if key == :include
           included = resolve_relative_path(value, options[:base_path] || base_path)
           included_options = load_options(included,
@@ -244,8 +244,8 @@ module Drntest
       Pathname(path).read.each_line do |line|
         if line[0] == "#"
           if DIRECTIVE_MATCHER =~ line
-            key = $1.gsub("-", "_").to_sym
             value = $2
+            key = $1.gsub("-", "_").to_sym
             case key
             when :include
               included = resolve_relative_path(value, options[:base_path] || base_path)
