@@ -56,15 +56,15 @@ module Drntest
     end
 
     def port
-      @owner.port
+      @port || @owner.port
     end
 
     def host
-      @owner.host
+      @host || @owner.host
     end
 
     def tag
-      @owner.tag
+      @tag || @owner.tag
     end
 
     private
