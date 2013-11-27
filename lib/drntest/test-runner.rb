@@ -44,7 +44,7 @@ module Drntest
     end
 
     def config_dir
-      (base_path + "config") + @owner.config
+      (@base_path + "config") + @owner.config
     end
 
     def config_file
@@ -212,7 +212,7 @@ module Drntest
             directive = Directive.new(line)
             if directive.type == :include
               included = resolve_relative_path(directive.value,
-                                               options[:base_path] || base_path)
+                                               options[:base_path] || @base_path)
               included_jsons = load_jsons(included)
               json_objects += included_jsons
             else
