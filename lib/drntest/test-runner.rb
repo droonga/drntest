@@ -211,7 +211,8 @@ module Drntest
           if Directive.directive?(line)
             directive = Directive.new(line)
             if directive.type == :include
-              included = resolve_relative_path(value, options[:base_path] || base_path)
+              included = resolve_relative_path(directive.value,
+                                               options[:base_path] || base_path)
               included_jsons = load_jsons(included)
               json_objects += included_jsons
             else
