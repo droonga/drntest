@@ -243,15 +243,15 @@ module Drntest
             value = $2
             case key
             when :include
-            included = resolve_relative_path(value, options[:base_path] || base_path)
-            included_jsons = load_jsons(included,
-                                        options.merge(:base_path => included))
-            included_jsons.collect! do |envelope|
-              # don't assert responses of included requests!
-              envelope["replyTo"] = nil
-              envelope
-            end
-            json_objects += included_jsons
+              included = resolve_relative_path(value, options[:base_path] || base_path)
+              included_jsons = load_jsons(included,
+                                          options.merge(:base_path => included))
+              included_jsons.collect! do |envelope|
+                # don't assert responses of included requests!
+                envelope["replyTo"] = nil
+                envelope
+              end
+              json_objects += included_jsons
             end
           end
         else
