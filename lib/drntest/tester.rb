@@ -59,7 +59,7 @@ module Drntest
         parser.on("--base=PATH",
                   "Path to the base directory including test suite, config and fixture",
                   "(#{tester.base_path})") do |base_path|
-          tester.base_path = Pathname(base_path).expand_path(File.dirname(__FILE__))
+          tester.base_path = Pathname(base_path).expand_path(Dir.pwd)
         end
 
         parser.on("--config=NAME",
@@ -99,7 +99,7 @@ module Drntest
       @port = 24224
       @host = "localhost"
       @tag  = "droonga"
-      @base_path = Pathname(File.dirname(__FILE__))
+      @base_path = Pathname(Dir.pwd)
       @config  = "default"
       @fluentd = "fluentd"
       @fluentd_options = []
