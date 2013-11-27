@@ -92,7 +92,7 @@ module Drntest
     end
 
     attr_accessor :port, :host, :tag, :fluentd, :fluentd_options
-    attr_accessor :pattern, :base_path
+    attr_accessor :pattern, :base_path, :config
 
     def initialize
       @port = 24224
