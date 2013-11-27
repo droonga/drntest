@@ -197,10 +197,12 @@ module Drntest
       results
     end
 
+    OPTION_MATCHER = /\A\#\@([^\s]+)(?:\s+(.+))?\n?\z/.freeze
+
     def load_options(path, options={})
       options = {}
       Pathname(path).read.each_line do |line|
-        next unless /\A\#\@([^\s]+)(?:\s+(.+))?\n?\z/ =~ line
+        next unless OPTION_MATCHER =~ line
         key = $1.to_sym
         # nil value means that it is a boolean option.
         value = $2 || true
@@ -236,8 +238,12 @@ module Drntest
       end
       Pathname(path).read.each_line do |line|
         if line[0] == "#"
-          if /\A\#\@include\s+(.+)\n?\z/ =~ line
-            included = resolve_relative_path($1, options[:base_path] || base_path)
+          if OPTION_MATCHER =~ line
+            key = $1.to_sym
+            value = $2
+            case key
+            when :include
+            included = resolve_relative_path(value, options[:base_path] || base_path)
             included_jsons = load_jsons(included,
                                         options.merge(:base_path => included))
             included_jsons.collect! do |envelope|
@@ -246,6 +252,7 @@ module Drntest
               envelope
             end
             json_objects += included_jsons
+            end
           end
         else
           parser << line
