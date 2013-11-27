@@ -258,18 +258,33 @@ module Drntest
       puts "Saving received results as #{output_path}"
       File.open(output_path, "w") do |file|
         results.each do |result|
-          json = JSON.pretty_generate(result)
-          file.puts(json)
+          begin
+            json = JSON.pretty_generate(result)
+            file.puts(json)
+          rescue JSON::GeneratorError => error
+            p error
+            p result
+          end
         end
       end
     end
 
     def show_diff(expecteds, actuals)
       expected_pretty = expecteds.collect do |expected|
-        JSON.pretty_generate(expected)
+        begin
+          JSON.pretty_generate(expected)
+        rescue JSON::GeneratorError => error
+          p error
+          p expected
+        end
       end.join("\n")
       actual_pretty = actuals.collect do |actual|
-        JSON.pretty_generate(actual)
+        begin
+          JSON.pretty_generate(actual)
+        rescue JSON::GeneratorError => error
+          p error
+          p actual
+        end
       end.join("\n")
 
       create_temporary_file("expected", expected_pretty) do |expected_file|
