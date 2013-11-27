@@ -59,7 +59,7 @@ module Drntest
         parser.on("--base=PATH",
                   "Path to the base directory including test suite, config and fixture",
                   "(#{tester.base_path})") do |base_path|
-          tester.base_path = Pathname(base_path)
+          tester.base_path = Pathname(base_path).expand_path(File.dirname(__FILE__))
         end
 
         parser.on("--config=NAME",
