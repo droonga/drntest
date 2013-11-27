@@ -205,7 +205,7 @@ module Drntest
     DIRECTIVE_MATCHER = /\A\#\@([^\s]+)(?:\s+(.+))?\n?\z/.freeze
 
     def load_options(path, options={})
-      options = {}
+      loaded_options = {}
       Pathname(path).read.each_line do |line|
         next unless DIRECTIVE_MATCHER =~ line
         key = $1.gsub(/-/, "_").to_sym
@@ -216,15 +216,15 @@ module Drntest
           included_options = load_options(included,
                                           options.merge(:base_path => included))
           included_options.each do |key, values|
-            options[key] ||= []
-            options[key] += values
+            loaded_options[key] ||= []
+            loaded_options[key] += values
           end
         else
-          options[key] ||= []
-          options[key] << value
+          loaded_options[key] ||= []
+          loaded_options[key] << value
         end
       end
-      options
+      loaded_options
     end
 
     def load_request_envelopes
