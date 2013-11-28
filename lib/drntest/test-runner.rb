@@ -129,7 +129,7 @@ module Drntest
       sleep_time = 1
       while timeout > 0
         sleep(sleep_time)
-        timeout -= sleep_time
+        timeout -= timeout
         if Process.waitpid(@engine_pid, Process::WNOHANG)
           terminated = true
           break
