@@ -127,7 +127,7 @@ module Drntest
       puts "==== Summary ===="
       p test_suites_result.summary
 
-      0 # FIXME
+      test_suites_result.success?
     end
 
     def load_tests(*targets)

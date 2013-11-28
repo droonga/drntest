@@ -28,5 +28,9 @@ module Drntest
       end
       status_counts
     end
+
+    def success?
+      summary[:failure].zero?
+    end
   end
 end
