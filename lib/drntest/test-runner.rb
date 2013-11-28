@@ -222,7 +222,7 @@ module Drntest
         else
           begin
             parser << line
-          rescue Yajl::ParseError => error
+          rescue StandardError => error
             p "Failed to load JSONs file: #{path.to_s}"
             raise error
           end
