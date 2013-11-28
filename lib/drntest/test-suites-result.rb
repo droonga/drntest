@@ -30,7 +30,7 @@ module Drntest
     end
 
     def success?
-      summary[:failure].zero?
+      summary[:failure].zero? && summary[:no_response].zero?
     end
   end
 end
