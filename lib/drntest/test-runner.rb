@@ -121,27 +121,7 @@ module Drntest
       return unless temporary_engine?
 
       Process.kill(:TERM, @engine_pid)
-
-      # TODO: It's a workaround.
-      # Implement engine's queue without Groonga's job queue.
-      terminated = false
-      timeout = 3
-      sleep_time = 1
-      while timeout > 0
-        sleep(sleep_time)
-        timeout -= timeout
-        if Process.waitpid(@engine_pid, Process::WNOHANG)
-          terminated = true
-          break
-        end
-      end
-      unless terminated
-        begin
-          Process.kill(:KILL, -@engine_pid)
-          Process.wait(@engine_pid)
-        rescue SystemCallError
-        end
-      end
+      Process.wait(@engine_pid)
 
       FileUtils.rm_rf(temporary_dir.to_s)
     end
