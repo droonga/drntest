@@ -85,7 +85,15 @@ module Drntest
           if /\A\/(.+)\/\z/ =~ pattern
             pattern = Regexp.new($1)
           end
-          tester.pattern = pattern
+          tester.test_pattern = pattern
+        end
+
+        parser.on("--test-suite=PATTERN",
+                  "Run only test suites which have a path matched to the given PATTERN") do |pattern|
+          if /\A\/(.+)\/\z/ =~ pattern
+            pattern = Regexp.new($1)
+          end
+          tester.suite_pattern = pattern
         end
 
         parser
@@ -93,7 +101,7 @@ module Drntest
     end
 
     attr_accessor :port, :host, :tag, :fluentd, :fluentd_options
-    attr_accessor :pattern, :base_path, :config
+    attr_accessor :test_pattern, :suite_pattern, :base_path, :config
 
     def initialize
       @port = 24224
@@ -103,7 +111,8 @@ module Drntest
       @config  = "default"
       @fluentd = "fluentd"
       @fluentd_options = []
-      @pattern = nil
+      @test_pattern = nil
+      @suite_pattern = nil
     end
 
     def run(*targets)
@@ -142,9 +151,15 @@ module Drntest
         end
       end
 
-      unless @pattern.nil?
+      unless @test_pattern.nil?
         tests.select! do |test|
-          @pattern === test.basename(".test").to_s
+          @test_pattern === test.basename(".test").to_s
+        end
+      end
+
+      unless @suite_pattern.nil?
+        tests.select! do |test|
+          @suite_pattern === test.dirname.to_s.sub(@base_path.to_s, "")
         end
       end
 
