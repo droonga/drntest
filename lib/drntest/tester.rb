@@ -17,6 +17,7 @@ require "shellwords"
 require "optparse"
 require "pathname"
 require "drntest/version"
+require "drntest/path"
 require "drntest/test-runner"
 require "drntest/test-suites-result"
 
@@ -28,7 +29,7 @@ module Drntest
         tester = new
         option_parser = create_option_parser(tester)
         targets = option_parser.parse!(argv)
-        targets << tester.base_path + "suite" if targets.empty?
+        targets << tester.base_path + Path::SUITE if targets.empty?
         tester.run(*targets)
       end
 

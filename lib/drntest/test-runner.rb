@@ -17,6 +17,7 @@ require "json"
 require "yajl"
 require "tempfile"
 require "pp"
+require "drntest/path"
 require "drntest/test-results"
 require "drntest/executor"
 require "fileutils"
@@ -44,7 +45,7 @@ module Drntest
     end
 
     def config_dir
-      (@base_path + "config") + @owner.config
+      (@base_path + Path::CONFIG) + @owner.config
     end
 
     def config_file
