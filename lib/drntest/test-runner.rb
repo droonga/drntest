@@ -17,10 +17,10 @@ require "json"
 require "yajl"
 require "tempfile"
 require "pp"
+require "fileutils"
 require "drntest/path"
 require "drntest/test-results"
 require "drntest/executor"
-require "fileutils"
 
 module Drntest
   class TestRunner
