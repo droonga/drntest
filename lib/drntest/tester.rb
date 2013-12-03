@@ -30,7 +30,6 @@ module Drntest
         tester = new
         option_parser = create_option_parser(tester)
         targets = option_parser.parse!(argv)
-        targets << tester.base_path + Path::SUITE if targets.empty?
         tester.run(*targets)
       end
 
@@ -142,6 +141,9 @@ module Drntest
     end
 
     def load_tests(*targets)
+      suite_path = @base_path + Path::SUITE
+      targets << suite_path if targets.empty?
+
       tests = []
       targets.each do |target|
         target_path = Pathname(target)
@@ -161,7 +163,8 @@ module Drntest
 
       unless @suite_pattern.nil?
         tests.select! do |test|
-          @suite_pattern === test.dirname.to_s.sub(@base_path.to_s, "")
+          test_suite_name = test.relative_path_from(suite_path).dirname.to_s
+          @suite_pattern === test_suite_name
         end
       end
 
