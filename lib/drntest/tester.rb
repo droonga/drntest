@@ -56,7 +56,7 @@ module Drntest
           tester.tag = tag
         end
 
-        parser.on("--base=PATH",
+        parser.on("--base-path=PATH",
                   "Path to the base directory including test suite, config and fixture",
                   "(#{tester.base_path})") do |base_path|
           tester.base_path = Pathname(base_path).expand_path(Dir.pwd)
