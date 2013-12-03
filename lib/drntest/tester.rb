@@ -16,6 +16,7 @@
 require "shellwords"
 require "optparse"
 require "pathname"
+
 require "drntest/version"
 require "drntest/path"
 require "drntest/test-runner"
