@@ -54,7 +54,6 @@ module Drntest
         normalize_groonga_command_result!(normalized_result[2])
       rescue StandardError => error
         p error
-        normalized_result
       end
     end
 
