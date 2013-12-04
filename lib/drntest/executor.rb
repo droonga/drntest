@@ -30,8 +30,9 @@ module Drntest
 
     private
     def execute_commands
-      client = Droonga::Client.new(tag: owner.tag, port: owner.port)
-      client.connection.send(request, :response => :one)
+      Droonga::Client.open(tag: owner.tag, port: owner.port) do |client|
+        client.connection.send(request, :response => :one)
+      end
     end
 
     def normalize_result(result)
