@@ -227,14 +227,21 @@ module Drntest
     end
 
     def format_results(results)
-      results.collect do |result|
-        begin
-          JSON.pretty_generate(result)
-        rescue JSON::GeneratorError => error
-          p error
-          p result
-        end
-      end.join("\n")
+      formatted_results = ""
+      results.each do |result|
+        formatted_results << format_result(result)
+        formatted_results << "\n"
+      end
+      formatted_results
+    end
+
+    def format_result(result)
+      begin
+        JSON.pretty_generate(result)
+      rescue JSON::GeneratorError => error
+        p error
+        p result
+      end
     end
 
     def create_temporary_file(key, content)
