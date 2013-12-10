@@ -22,6 +22,7 @@ require "fileutils"
 require "drntest/path"
 require "drntest/test-results"
 require "drntest/test-executor"
+require "drntest/json-loader"
 
 module Drntest
   class TestRunner
@@ -161,21 +162,9 @@ module Drntest
       load_jsons(expected_path)
     end
 
-    def load_jsons(path, options={})
-      parser = Yajl::Parser.new
-      json_objects = []
-      parser.on_parse_complete = Proc.new do |json_object|
-        json_objects << json_object
-      end
-      Pathname(path).read.each_line do |line|
-        begin
-          parser << line
-        rescue StandardError => error
-          p "Failed to load JSONs file: #{path.to_s}"
-          raise error
-        end
-      end
-      json_objects
+    def load_jsons(path)
+      loader = JSONLoader.new
+      loader.load(path)
     end
 
     def expected_exist?
