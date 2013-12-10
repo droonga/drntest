@@ -211,22 +211,8 @@ module Drntest
     end
 
     def show_diff(expecteds, actuals)
-      expected_pretty = expecteds.collect do |expected|
-        begin
-          JSON.pretty_generate(expected)
-        rescue JSON::GeneratorError => error
-          p error
-          p expected
-        end
-      end.join("\n")
-      actual_pretty = actuals.collect do |actual|
-        begin
-          JSON.pretty_generate(actual)
-        rescue JSON::GeneratorError => error
-          p error
-          p actual
-        end
-      end.join("\n")
+      expected_pretty = format_results(expecteds)
+      actual_pretty = format_results(actuals)
 
       create_temporary_file("expected", expected_pretty) do |expected_file|
         create_temporary_file("actual", actual_pretty) do |actual_file|
@@ -238,6 +224,17 @@ module Drntest
           system("diff", *diff_options)
         end
       end
+    end
+
+    def format_results(results)
+      results.collect do |result|
+        begin
+          JSON.pretty_generate(result)
+        rescue JSON::GeneratorError => error
+          p error
+          p result
+        end
+      end.join("\n")
     end
 
     def create_temporary_file(key, content)
