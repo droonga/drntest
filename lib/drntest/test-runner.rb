@@ -211,11 +211,11 @@ module Drntest
     end
 
     def show_diff(expecteds, actuals)
-      expected_pretty = format_results(expecteds)
-      actual_pretty = format_results(actuals)
+      formatted_expected = format_results(expecteds)
+      formatted_actual = format_results(actuals)
 
-      create_temporary_file("expected", expected_pretty) do |expected_file|
-        create_temporary_file("actual", actual_pretty) do |actual_file|
+      create_temporary_file("expected", formatted_expected) do |expected_file|
+        create_temporary_file("actual", formatted_actual) do |actual_file|
           diff_options = [
             "-u",
             "--label", "(expected)", expected_file.path,
