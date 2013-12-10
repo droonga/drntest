@@ -21,7 +21,7 @@ require "fileutils"
 
 require "drntest/path"
 require "drntest/test-results"
-require "drntest/request-executor"
+require "drntest/test-executor"
 
 module Drntest
   class TestRunner
@@ -70,12 +70,6 @@ module Drntest
     end
 
     private
-    def resolve_relative_path(path, base)
-      path = path.to_s
-      path = path[2..-1] if path[0..1] == "./"
-      Pathname(path).expand_path(base)
-    end
-
     def prepare
       if catalog_file.exist?
         catalog_json = JSON.parse(catalog_file.read, :symbolize_names => true)
@@ -139,21 +133,8 @@ module Drntest
     def process_requests
       results = TestResults.new(@target_path)
 
-      logging = true
-      load_request_envelopes.each do |request|
-        if request.is_a?(Directive)
-          case request.type
-          when :enable_logging
-            logging = true
-          when :disable_logging
-            logging = false
-          end
-          next
-        end
-        executor = RequestExecutor.new(self, request)
-        response = executor.execute
-        results.actuals << response if logging
-      end
+      executor = TestExecutor.new(self, @target_path)
+      results.actuals = executor.execute
       if expected_exist?
         results.expecteds = load_expected_responses
       end
@@ -176,30 +157,8 @@ module Drntest
       results
     end
 
-    def load_request_envelopes
-      load_jsons(@target_path)
-    end
-
     def load_expected_responses
       load_jsons(expected_path)
-    end
-
-    class Directive
-      MATCHER = /\A\#\@([^\s]+)(?:\s+(.+))?\z/.freeze
-
-      class << self
-        def directive?(source)
-          MATCHER =~ source.strip
-        end
-      end
-
-      attr_reader :type, :value
-
-      def initialize(source)
-        MATCHER =~ source.strip
-        @value = $2
-        @type = $1.gsub("-", "_").to_sym
-      end
     end
 
     def load_jsons(path, options={})
@@ -209,25 +168,11 @@ module Drntest
         json_objects << json_object
       end
       Pathname(path).read.each_line do |line|
-        if line[0] == "#"
-          if Directive.directive?(line)
-            directive = Directive.new(line)
-            if directive.type == :include
-              included = resolve_relative_path(directive.value,
-                                               options[:base_path] || @base_path)
-              included_jsons = load_jsons(included)
-              json_objects += included_jsons
-            else
-              json_objects << directive
-            end
-          end
-        else
-          begin
-            parser << line
-          rescue StandardError => error
-            p "Failed to load JSONs file: #{path.to_s}"
-            raise error
-          end
+        begin
+          parser << line
+        rescue StandardError => error
+          p "Failed to load JSONs file: #{path.to_s}"
+          raise error
         end
       end
       json_objects
