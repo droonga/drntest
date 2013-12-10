@@ -16,7 +16,7 @@
 require "droonga/client"
 
 module Drntest
-  class Executor
+  class RequestExecutor
     attr_reader :owner, :request
 
     def initialize(owner, request)
@@ -30,7 +30,9 @@ module Drntest
 
     private
     def execute_commands
-      Droonga::Client.open(tag: owner.tag, port: owner.port) do |client|
+      Droonga::Client.open(tag: owner.tag,
+                           port: owner.port,
+                           connect_timeout: 0.5) do |client|
         client.connection.send(request, :response => :one)
       end
     end

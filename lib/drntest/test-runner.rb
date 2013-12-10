@@ -21,7 +21,7 @@ require "fileutils"
 
 require "drntest/path"
 require "drntest/test-results"
-require "drntest/executor"
+require "drntest/request-executor"
 
 module Drntest
   class TestRunner
@@ -150,7 +150,7 @@ module Drntest
           end
           next
         end
-        executor = Executor.new(self, request)
+        executor = RequestExecutor.new(self, request)
         response = executor.execute
         results.actuals << response if logging
       end
