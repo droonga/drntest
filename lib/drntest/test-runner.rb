@@ -238,9 +238,8 @@ module Drntest
     def format_result(result)
       begin
         JSON.pretty_generate(result)
-      rescue JSON::GeneratorError => error
-        p error
-        p result
+      rescue JSON::GeneratorError
+        result
       end
     end
 
