@@ -200,12 +200,11 @@ module Drntest
       File.open(output_path, "w") do |file|
         results.each do |result|
           begin
-            json = JSON.pretty_generate(result)
-            file.puts(json)
-          rescue JSON::GeneratorError => error
-            p error
-            p result
+            formatted_result = JSON.pretty_generate(result)
+          rescue JSON::GeneratorError
+            formatted_result = result
           end
+          file.puts(formatted_result)
         end
       end
     end
