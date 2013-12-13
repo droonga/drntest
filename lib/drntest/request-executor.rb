@@ -25,11 +25,11 @@ module Drntest
     end
 
     def execute
-      normalize_result(execute_commands)
+      normalize_result(execute_command)
     end
 
     private
-    def execute_commands
+    def execute_command
       Droonga::Client.open(tag: owner.tag,
                            port: owner.port,
                            connect_timeout: 0.5) do |client|
