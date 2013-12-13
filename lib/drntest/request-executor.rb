@@ -32,7 +32,7 @@ module Drntest
     def execute_command
       Droonga::Client.open(tag: owner.tag,
                            port: owner.port,
-                           connect_timeout: 0.5) do |client|
+                           connect_timeout: 1) do |client|
         client.connection.send(request, :response => :one)
       end
     end
