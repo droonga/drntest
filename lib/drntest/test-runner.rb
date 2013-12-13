@@ -238,7 +238,7 @@ module Drntest
       begin
         JSON.pretty_generate(result)
       rescue JSON::GeneratorError
-        result
+        result.inspect
       end
     end
 
