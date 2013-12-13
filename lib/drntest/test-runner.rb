@@ -199,12 +199,7 @@ module Drntest
       puts "Saving received results as #{output_path}"
       File.open(output_path, "w") do |file|
         results.each do |result|
-          begin
-            formatted_result = JSON.pretty_generate(result)
-          rescue JSON::GeneratorError
-            formatted_result = result
-          end
-          file.puts(formatted_result)
+          file.puts(format_result(result))
         end
       end
     end
