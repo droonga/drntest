@@ -59,9 +59,9 @@ module Drntest
 
     def load_jsons(path)
       parser = Yajl::Parser.new
-      json_objects = []
-      parser.on_parse_complete = Proc.new do |json_object|
-        json_objects << json_object
+      objects = []
+      parser.on_parse_complete = Proc.new do |object|
+        objects << object
       end
       Pathname(path).read.each_line do |line|
         if line[0] == "#"
