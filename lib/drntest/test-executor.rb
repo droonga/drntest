@@ -34,7 +34,8 @@ module Drntest
                                     port: owner.port) do |client|
         requests = []
         operations.each do |operation|
-          if operation.is_a?(Directive)
+          case operation
+          when Directive
             case operation.type
             when :enable_logging
               logging = true
@@ -45,8 +46,7 @@ module Drntest
             when :disable_logging
               logging = false
             end
-            next
-          end
+          else
           if logging
             response = client.connection.execute(operation)
             actuals << normalize_response(operation, response)
@@ -54,6 +54,7 @@ module Drntest
             requests << client.connection.execute(operation,
                                                   :connect_timeout => 2) do
             end
+          end
           end
         end
         requests.each do |request|
