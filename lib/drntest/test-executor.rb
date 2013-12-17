@@ -29,7 +29,7 @@ module Drntest
     def execute
       actuals = []
       logging = true
-      load_request_envelopes.each do |request|
+      requests.each do |request|
         if request.is_a?(Directive)
           case request.type
           when :enable_logging
@@ -53,7 +53,7 @@ module Drntest
       Pathname(path).expand_path(@owner.base_path)
     end
 
-    def load_request_envelopes
+    def requests
       load_jsons(@test_path)
     end
 
