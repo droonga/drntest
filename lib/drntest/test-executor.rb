@@ -30,8 +30,7 @@ module Drntest
     def execute
       actuals = []
       logging = true
-      client = Droonga::Client.open(tag: owner.tag,
-                                    port: owner.port) do |client|
+      Droonga::Client.open(tag: owner.tag, port: owner.port) do |client|
         requests = []
         operations.each do |operation|
           case operation
