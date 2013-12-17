@@ -13,48 +13,32 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-require "droonga/client"
-
 module Drntest
-  class RequestExecutor
-    attr_reader :owner, :request
-
-    def initialize(owner, request)
-      @owner = owner
+  class ResponseNormalizer
+    def initialize(request, response)
       @request = request
+      @response = response
     end
 
-    def execute
-      normalize_result(execute_command)
+    def normalize
+      return @response if @response.nil?
+
+      normalized_response = @response.dup
+      normalize_envelope!(normalized_response)
+      normalize_body!(normalized_response)
+      normalized_response
     end
 
     private
-    def execute_command
-      Droonga::Client.open(tag: owner.tag,
-                           port: owner.port,
-                           connect_timeout: 1) do |client|
-        client.connection.send(request, :response => :one)
-      end
-    end
-
-    def normalize_result(result)
-      return result if result.nil?
-
-      normalized_result = result.dup
-      normalize_envelope!(normalized_result)
-      normalize_body!(normalized_result)
-      normalized_result
-    end
-
-    def normalize_envelope!(normalized_result)
+    def normalize_envelope!(normalized_response)
       normalized_start_time = 0
-      normalized_result[1] = normalized_start_time
+      normalized_response[1] = normalized_start_time
     end
 
-    def normalize_body!(normalized_result)
+    def normalize_body!(normalized_response)
       return unless groonga_command?
       begin
-        normalize_groonga_command_result!(normalized_result[2])
+        normalize_groonga_command_response!(normalized_response[2])
       rescue StandardError => error
         p error
       end
@@ -66,11 +50,11 @@ module Drntest
       "select",
     ]
     def groonga_command?
-      GROONGA_COMMANDS.include?(request["type"])
+      GROONGA_COMMANDS.include?(@request["type"])
     end
 
-    def normalize_groonga_command_result!(result)
-      normalize_groonga_command_header!(result["body"][0])
+    def normalize_groonga_command_response!(response)
+      normalize_groonga_command_header!(response["body"][0])
     end
 
     def normalize_groonga_command_header!(header)

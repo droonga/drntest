@@ -13,8 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+require "droonga/client"
+
 require "drntest/json-loader"
-require "drntest/request-executor"
+require "drntest/response-normalizer"
 
 module Drntest
   class TestExecutor
@@ -28,19 +30,35 @@ module Drntest
     def execute
       actuals = []
       logging = true
-      requests.each do |request|
-        if request.is_a?(Directive)
-          case request.type
-          when :enable_logging
-            logging = true
-          when :disable_logging
-            logging = false
+      client = Droonga::Client.open(tag: owner.tag,
+                                    port: owner.port) do |client|
+        requests = []
+        test_commands.each do |test_command|
+          if test_command.is_a?(Directive)
+            case test_command.type
+            when :enable_logging
+              logging = true
+              requests.each do |request|
+                request.wait
+              end
+              requests.clear
+            when :disable_logging
+              logging = false
+            end
+            next
           end
-          next
+          if logging
+            response = client.connection.execute(test_command)
+            actuals << normalize_response(test_command, response)
+          else
+            requests << client.connection.execute(test_command,
+                                                  :connect_timeout => 2) do
+            end
+          end
         end
-        executor = RequestExecutor.new(@owner, request)
-        response = executor.execute
-        actuals << response if logging
+        requests.each do |request|
+          request.wait
+        end
       end
       actuals
     end
@@ -52,7 +70,12 @@ module Drntest
       Pathname(path).expand_path(@owner.base_path)
     end
 
-    def requests
+    def normalize_response(request, response)
+      normalizer = ResponseNormalizer.new(request, response)
+      normalizer.normalize
+    end
+
+    def test_commands
       load_jsons(@test_path)
     end
 
