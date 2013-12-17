@@ -47,14 +47,14 @@ module Drntest
               logging = false
             end
           else
-          if logging
-            response = client.connection.execute(operation)
-            actuals << normalize_response(operation, response)
-          else
-            requests << client.connection.execute(operation,
-                                                  :connect_timeout => 2) do
+            if logging
+              response = client.connection.execute(operation)
+              actuals << normalize_response(operation, response)
+            else
+              requests << client.connection.execute(operation,
+                                                    :connect_timeout => 2) do
+              end
             end
-          end
           end
         end
         requests.each do |request|
