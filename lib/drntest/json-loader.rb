@@ -17,6 +17,18 @@ require "yajl"
 
 module Drntest
   class JSONLoader
+    class << self
+      def report_error(path, data, error)
+        marker = "-" * 60
+        puts("Failed to load JSONs file: #{path}")
+        puts(marker)
+        puts(data)
+        puts(marker)
+        puts(error)
+        puts(marker)
+      end
+    end
+
     attr_reader :objects
 
     def initialize
@@ -39,13 +51,7 @@ module Drntest
           begin
             self << line
           rescue Yajl::ParseError => error
-            marker = "-" * 60
-            puts("Failed to load JSONs file: #{path}")
-            puts(marker)
-            puts(data)
-            puts(marker)
-            puts(error)
-            puts(marker)
+            self.class.report_error(path, data, error)
             break
           end
         end

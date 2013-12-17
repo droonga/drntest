@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-require "yajl"
-
+require "drntest/json-loader"
 require "drntest/request-executor"
 
 module Drntest
@@ -63,7 +62,9 @@ module Drntest
       parser.on_parse_complete = lambda do |object|
         objects << object
       end
+      data = ""
       Pathname(path).read.each_line do |line|
+        data << line
         if line[0] == "#"
           if Directive.directive?(line)
             directive = Directive.new(line)
@@ -78,8 +79,8 @@ module Drntest
         else
           begin
             parser << line
-          rescue StandardError => error
-            p "Failed to load JSONs file: #{path.to_s}"
+          rescue Yajl::ParseError => error
+            JSONLoader.report_error(path, data, error)
             raise error
           end
         end
