@@ -85,8 +85,7 @@ module Drntest
     def setup
       return unless temporary_engine?
 
-      FileUtils.rm_rf(temporary_dir)
-      FileUtils.mkdir_p(temporary_dir)
+      setup_temporary_dir
 
       temporary_config = temporary_dir + "fluentd.conf"
       FileUtils.cp(config_file, temporary_config)
@@ -120,11 +119,29 @@ module Drntest
       Process.kill(:TERM, @engine_pid)
       Process.wait(@engine_pid)
 
+      teardown_temporary_dir
+    end
+
+    def setup_temporary_dir
+      tmpfs = Pathname("/run/shm")
+      if tmpfs.directory? and tmpfs.writable?
+        FileUtils.rm_rf(temporary_base_dir)
+        FileUtils.ln_s(tmpfs.to_s, temporary_base_dir.to_s)
+      end
+      FileUtils.rm_rf(temporary_dir)
+      FileUtils.mkdir_p(temporary_dir)
+    end
+
+    def teardown_temporary_dir
       FileUtils.rm_rf(temporary_dir.to_s)
     end
 
+    def temporary_base_dir
+      @base_path + "tmp"
+    end
+
     def temporary_dir
-      config_dir + "tmp"
+      temporary_base_dir + "drntest"
     end
 
     def temporary_engine?
