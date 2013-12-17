@@ -85,8 +85,6 @@ module Drntest
         else
           @requests << @client.connection.execute(request,
                                                   :connect_timeout => 2) do
-            continue_receive = false
-            continue_receive
           end
         end
       end
