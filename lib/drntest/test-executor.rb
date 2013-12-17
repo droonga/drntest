@@ -60,7 +60,7 @@ module Drntest
     def load_jsons(path)
       parser = Yajl::Parser.new
       objects = []
-      parser.on_parse_complete = Proc.new do |object|
+      parser.on_parse_complete = lambda do |object|
         objects << object
       end
       Pathname(path).read.each_line do |line|
