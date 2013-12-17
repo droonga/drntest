@@ -69,8 +69,8 @@ module Drntest
             directive = Directive.new(line)
             if directive.type == :include
               included = resolve_relative_path(directive.value)
-              included_jsons = load_jsons(included)
-              objects += included_jsons
+              included_objects = load_jsons(included)
+              objects += included_objects
             else
               objects << directive
             end
