@@ -33,9 +33,9 @@ module Drntest
       client = Droonga::Client.open(tag: owner.tag,
                                     port: owner.port) do |client|
         requests = []
-        test_commands.each do |test_command|
-          if test_command.is_a?(TestLoader::Directive)
-            case test_command.type
+        operations.each do |operation|
+          if operation.is_a?(TestLoader::Directive)
+            case operation.type
             when :enable_logging
               logging = true
               requests.each do |request|
@@ -48,10 +48,10 @@ module Drntest
             next
           end
           if logging
-            response = client.connection.execute(test_command)
-            actuals << normalize_response(test_command, response)
+            response = client.connection.execute(operation)
+            actuals << normalize_response(operation, response)
           else
-            requests << client.connection.execute(test_command,
+            requests << client.connection.execute(operation,
                                                   :connect_timeout => 2) do
             end
           end
@@ -69,7 +69,7 @@ module Drntest
       normalizer.normalize
     end
 
-    def test_commands
+    def operations
       loader = TestLoader.new(@owner, @test_path)
       loader.load
     end

@@ -37,9 +37,9 @@ module Drntest
 
     def load_test_file(path)
       parser = Yajl::Parser.new
-      objects = []
-      parser.on_parse_complete = lambda do |object|
-        objects << object
+      operations = []
+      parser.on_parse_complete = lambda do |operation|
+        operations << operation
       end
       data = ""
       Pathname(path).read.each_line do |line|
@@ -49,10 +49,10 @@ module Drntest
             directive = Directive.new(line)
             if directive.type == :include
               included = resolve_relative_path(directive.value)
-              included_objects = load_test_file(included)
-              objects += included_objects
+              included_operations = load_test_file(included)
+              operations += included_operations
             else
-              objects << directive
+              operations << directive
             end
           end
         else
@@ -64,7 +64,7 @@ module Drntest
           end
         end
       end
-      objects
+      operations
     end
 
     class Directive
