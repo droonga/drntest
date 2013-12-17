@@ -44,17 +44,20 @@ module Drntest
       data = ""
       Pathname(path).read.each_line do |line|
         data << line
-        if line[0] == "#"
-          if Directive.directive?(line)
-            directive = Directive.new(line)
-            if directive.type == :include
-              included = resolve_relative_path(directive.value)
-              included_operations = load_test_file(included)
-              operations += included_operations
-            else
-              operations << directive
-            end
+        case line.chomp
+        when /\A\#\@([^\s]+)(?:\s+(.+))?\z/
+          type = $1
+          value = $2
+          directive = Directive.new(type, value)
+          if directive.type == :include
+            included = resolve_relative_path(directive.value)
+            included_operations = load_test_file(included)
+            operations += included_operations
+          else
+            operations << directive
           end
+        when /\A\#/
+          # comment
         else
           begin
             parser << line
@@ -68,20 +71,16 @@ module Drntest
     end
 
     class Directive
-      MATCHER = /\A\#\@([^\s]+)(?:\s+(.+))?\z/.freeze
-
-      class << self
-        def directive?(source)
-          MATCHER =~ source.strip
-        end
-      end
-
       attr_reader :type, :value
 
-      def initialize(source)
-        MATCHER =~ source.strip
-        @value = $2
-        @type = $1.gsub("-", "_").to_sym
+      def initialize(type, value)
+        @type = normalize_type(type)
+        @value = value
+      end
+
+      private
+      def normalize_type(type)
+        type.gsub("-", "_").to_sym
       end
     end
   end
