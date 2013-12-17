@@ -28,50 +28,78 @@ module Drntest
     end
 
     def execute
-      actuals = []
-      logging = true
       Droonga::Client.open(tag: owner.tag, port: owner.port) do |client|
-        requests = []
+        context = Context.new(client)
         operations.each do |operation|
-          case operation
-          when Directive
-            case operation.type
-            when :enable_logging
-              logging = true
-              requests.each do |request|
-                request.wait
-              end
-              requests.clear
-            when :disable_logging
-              logging = false
-            end
-          else
-            if logging
-              response = client.connection.execute(operation)
-              actuals << normalize_response(operation, response)
-            else
-              requests << client.connection.execute(operation,
-                                                    :connect_timeout => 2) do
-              end
-            end
-          end
+          context.execute(operation)
         end
-        requests.each do |request|
-          request.wait
-        end
+        context.finish
+        context.responses
       end
-      actuals
     end
 
     private
-    def normalize_response(request, response)
-      normalizer = ResponseNormalizer.new(request, response)
-      normalizer.normalize
-    end
-
     def operations
       loader = TestLoader.new(@owner, @test_path)
       loader.load
+    end
+
+    class Context
+      attr_reader :responses
+
+      def initialize(client)
+        @client = client
+        @requests = []
+        @responses = []
+        @logging = true
+      end
+
+      def execute(operation)
+        case operation
+        when Directive
+          execute_directive(operation)
+        else
+          execute_request(operation)
+        end
+      end
+
+      def finish
+        consume_requests
+      end
+
+      private
+      def execute_directive(directive)
+        case directive.type
+        when :enable_logging
+          @logging = true
+          consume_requests
+        when :disable_logging
+          @logging = false
+        end
+      end
+
+      def execute_request(request)
+        if @logging
+          response = @client.connection.execute(request)
+          @responses << normalize_response(request, response)
+        else
+          @requests << @client.connection.execute(request,
+                                                  :connect_timeout => 2) do
+          end
+        end
+      end
+
+      def consume_requests
+        @requests.each do |request|
+          request.wait
+        end
+        @requests.clear
+      end
+
+      def normalize_response(request, response)
+        normalizer = ResponseNormalizer.new(request, response)
+        normalizer.normalize
+      end
     end
   end
 end
