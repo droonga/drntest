@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 require "drntest/json-loader"
+require "drntest/directive"
 
 module Drntest
   class TestLoader
@@ -68,20 +69,6 @@ module Drntest
         end
       end
       operations
-    end
-
-    class Directive
-      attr_reader :type, :value
-
-      def initialize(type, value)
-        @type = normalize_type(type)
-        @value = value
-      end
-
-      private
-      def normalize_type(type)
-        type.gsub("-", "_").to_sym
-      end
     end
   end
 end

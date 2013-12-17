@@ -34,7 +34,7 @@ module Drntest
                                     port: owner.port) do |client|
         requests = []
         operations.each do |operation|
-          if operation.is_a?(TestLoader::Directive)
+          if operation.is_a?(Directive)
             case operation.type
             when :enable_logging
               logging = true
