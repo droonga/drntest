@@ -15,7 +15,7 @@
 
 require "droonga/client"
 
-require "drntest/json-loader"
+require "drntest/test-loader"
 require "drntest/response-normalizer"
 
 module Drntest
@@ -34,7 +34,7 @@ module Drntest
                                     port: owner.port) do |client|
         requests = []
         test_commands.each do |test_command|
-          if test_command.is_a?(Directive)
+          if test_command.is_a?(TestLoader::Directive)
             case test_command.type
             when :enable_logging
               logging = true
@@ -64,69 +64,14 @@ module Drntest
     end
 
     private
-    def resolve_relative_path(path)
-      path = path.to_s
-      path = path[2..-1] if path[0..1] == "./"
-      Pathname(path).expand_path(@owner.base_path)
-    end
-
     def normalize_response(request, response)
       normalizer = ResponseNormalizer.new(request, response)
       normalizer.normalize
     end
 
     def test_commands
-      load_jsons(@test_path)
-    end
-
-    def load_jsons(path)
-      parser = Yajl::Parser.new
-      objects = []
-      parser.on_parse_complete = lambda do |object|
-        objects << object
-      end
-      data = ""
-      Pathname(path).read.each_line do |line|
-        data << line
-        if line[0] == "#"
-          if Directive.directive?(line)
-            directive = Directive.new(line)
-            if directive.type == :include
-              included = resolve_relative_path(directive.value)
-              included_objects = load_jsons(included)
-              objects += included_objects
-            else
-              objects << directive
-            end
-          end
-        else
-          begin
-            parser << line
-          rescue Yajl::ParseError => error
-            JSONLoader.report_error(path, data, error)
-            raise error
-          end
-        end
-      end
-      objects
-    end
-
-    class Directive
-      MATCHER = /\A\#\@([^\s]+)(?:\s+(.+))?\z/.freeze
-
-      class << self
-        def directive?(source)
-          MATCHER =~ source.strip
-        end
-      end
-
-      attr_reader :type, :value
-
-      def initialize(source)
-        MATCHER =~ source.strip
-        @value = $2
-        @type = $1.gsub("-", "_").to_sym
-      end
+      loader = TestLoader.new(@owner, @test_path)
+      loader.load
     end
   end
 end
