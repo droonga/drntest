@@ -35,11 +35,6 @@ module Drntest
       Pathname(path).expand_path(@owner.base_path)
     end
 
-    def normalize_response(request, response)
-      normalizer = ResponseNormalizer.new(request, response)
-      normalizer.normalize
-    end
-
     def load_test_file(path)
       parser = Yajl::Parser.new
       objects = []
