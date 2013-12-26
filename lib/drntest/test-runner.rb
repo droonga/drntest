@@ -247,6 +247,7 @@ module Drntest
     end
 
     def format_result(result)
+      return "" if result.nil?
       begin
         JSON.pretty_generate(result)
       rescue JSON::GeneratorError
