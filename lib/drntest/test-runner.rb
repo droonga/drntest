@@ -98,8 +98,6 @@ module Drntest
         *@owner.fluentd_options,
       ]
       engine_env = {
-        "RUBYOPT" => nil,
-        "BUNDLE_GEMFILE" => nil,
         "DROONGA_CATALOG" => temporary_catalog.to_s,
       }
       engine_options = {
