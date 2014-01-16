@@ -80,11 +80,10 @@ module Drntest
 
       def execute_request(request)
         if @logging
-          response = @client.connection.execute(request)
+          response = @client.shuttle(request)
           @responses << normalize_response(request, response)
         else
-          @requests << @client.connection.execute(request,
-                                                  :connect_timeout => 2) do
+          @requests << @client.shuttle(request, :connect_timeout => 2) do
           end
         end
       end
