@@ -24,9 +24,9 @@ module Drntest
 
     def initialize(params)
       @config_dir = Pathname(params[:config_dir])
-      @default_port => params[:default_port]
-      @default_host => params[:default_host]
-      @default_tag => params[:default_tag]
+      @default_port = params[:default_port]
+      @default_host = params[:default_host]
+      @default_tag = params[:default_tag]
       @fluentd = params[:fluentd]
       @fluentd_options = params[:fluentd_options]
     end
