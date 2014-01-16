@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Droonga Project
+# Copyright (C) 2013-2014  Droonga Project
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ require "drntest/path"
 require "drntest/test-results"
 require "drntest/test-executor"
 require "drntest/json-loader"
+require "drntest/engine"
 
 module Drntest
   class TestRunner
@@ -32,16 +33,21 @@ module Drntest
       @owner = owner
       @base_path = Pathname(owner.base_path)
       @target_path = Pathname(target)
+      @engine = Engine.new(:config_dir => config_dir,
+                           :default_port => @owner.port,
+                           :default_host => @owner.host,
+                           :default_tag => @owner.tag,
+                           :fluentd => @owner.fluentd,
+                           :fluentd_options => @owner.fluentd_options)
     end
 
     def run
       print "#{@target_path}: "
-      prepare
-      setup
+      @engine.start
       begin
         results = process_requests
       ensure
-        teardown
+        @engine.stop
       end
       results
     end
@@ -50,102 +56,7 @@ module Drntest
       (@base_path + Path::CONFIG) + @owner.config
     end
 
-    def config_file
-      config_dir + "fluentd.conf"
-    end
-
-    def catalog_file
-      config_dir + "catalog.json"
-    end
-
-    def port
-      @port || @owner.port
-    end
-
-    def host
-      @host || @owner.host
-    end
-
-    def tag
-      @tag || @owner.tag
-    end
-
     private
-    def prepare
-      if catalog_file.exist?
-        catalog_json = JSON.parse(catalog_file.read, :symbolize_names => true)
-        zone = catalog_json[:zones].first
-        /\A([^:]+):(\d+)\/(.+)\z/ =~ zone
-        @host = "localhost" # $1
-        @port = $2.to_i
-        @tag  = $3
-      end
-    end
-
-    def setup
-      return unless temporary_engine?
-
-      setup_temporary_dir
-
-      temporary_config = temporary_dir + "fluentd.conf"
-      FileUtils.cp(config_file, temporary_config)
-      temporary_catalog = temporary_dir + "catalog.json"
-      FileUtils.cp(catalog_file, temporary_catalog)
-
-      engine_command = [
-        @owner.fluentd,
-        "--config", temporary_config.to_s,
-        *@owner.fluentd_options,
-      ]
-      engine_env = {
-        "DROONGA_CATALOG" => temporary_catalog.to_s,
-      }
-      engine_options = {
-        :chdir => temporary_dir.to_s,
-        STDERR => STDOUT,
-      }
-      arguments = [engine_env, *engine_command]
-      arguments << engine_options
-      @engine_pid = Process.spawn(*arguments)
-
-      wait_until_engine_ready
-    end
-
-    def teardown
-      return unless temporary_engine?
-
-      Process.kill(:TERM, @engine_pid)
-      Process.wait(@engine_pid)
-
-      teardown_temporary_dir
-    end
-
-    def setup_temporary_dir
-      tmpfs = Pathname("/run/shm")
-      if tmpfs.directory? and tmpfs.writable?
-        FileUtils.rm_rf(temporary_base_dir)
-        FileUtils.ln_s(tmpfs.to_s, temporary_base_dir.to_s)
-      end
-      FileUtils.rm_rf(temporary_dir)
-      FileUtils.mkdir_p(temporary_dir)
-    end
-
-    def teardown_temporary_dir
-      FileUtils.rm_rf(temporary_dir.to_s)
-    end
-
-    def temporary_base_dir
-      @base_path + "tmp"
-    end
-
-    def temporary_dir
-      temporary_base_dir + "drntest"
-    end
-
-    def temporary_engine?
-      @owner.fluentd && config_file.exist?
-    end
-
     def process_requests
       results = TestResults.new(@target_path)
 
@@ -258,22 +169,6 @@ module Drntest
       file.write(content)
       file.close
       yield(file)
-    end
-
-    def engine_ready?
-      begin
-        socket = TCPSocket.new(@host, @port)
-        socket.close
-        true
-      rescue Errno::ECONNREFUSED
-        false
-      end
-    end
-
-    def wait_until_engine_ready
-      until engine_ready?
-        sleep 1
-      end
     end
   end
 end
