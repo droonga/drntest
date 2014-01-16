@@ -20,10 +20,11 @@ require "fileutils"
 
 module Drntest
   class Engine
-    attr_reader :config_dir, :fluentd, :fluentd_options
+    attr_reader :fluentd, :fluentd_options
 
     def initialize(params)
-      @config_dir = Pathname(params[:config_dir])
+      @base_path = params[:base_path]
+      @config_dir = params[:config_dir]
       @default_port = params[:default_port]
       @default_host = params[:default_host]
       @default_tag = params[:default_tag]
@@ -41,11 +42,11 @@ module Drntest
     end
 
     def config_file
-      config_dir + "fluentd.conf"
+      @config_dir + "fluentd.conf"
     end
 
     def catalog_file
-      config_dir + "catalog.json"
+      @config_dir + "catalog.json"
     end
 
     def port

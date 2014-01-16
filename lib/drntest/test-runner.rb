@@ -33,7 +33,8 @@ module Drntest
       @owner = owner
       @base_path = Pathname(owner.base_path)
       @target_path = Pathname(target)
-      @engine = Engine.new(:config_dir => config_dir,
+      @engine = Engine.new(:base_path => @base_path,
+                           :config_dir => config_dir,
                            :default_port => @owner.port,
                            :default_host => @owner.host,
                            :default_tag => @owner.tag,
