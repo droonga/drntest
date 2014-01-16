@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Droonga Project
+# Copyright (C) 2013-2014  Droonga Project
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,15 +20,13 @@ require "drntest/response-normalizer"
 
 module Drntest
   class TestExecutor
-    attr_reader :owner, :test_path
-
-    def initialize(owner, test_path)
-      @owner = owner
+    def initialize(config, test_path)
+      @config = config
       @test_path = test_path
     end
 
     def execute
-      Droonga::Client.open(tag: owner.tag, port: owner.port) do |client|
+      Droonga::Client.open(tag: @config.tag, port: @config.port) do |client|
         context = Context.new(client)
         operations.each do |operation|
           context.execute(operation)
@@ -40,7 +38,7 @@ module Drntest
 
     private
     def operations
-      loader = TestLoader.new(@owner, @test_path)
+      loader = TestLoader.new(@config, @test_path)
       loader.load
     end
 

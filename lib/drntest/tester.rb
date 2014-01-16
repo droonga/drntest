@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Droonga Project
+# Copyright (C) 2013-2014  Droonga Project
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@ require "optparse"
 require "pathname"
 
 require "drntest/version"
-require "drntest/path"
+require "drntest/configuration"
 require "drntest/test-runner"
 require "drntest/test-suites-result"
 
@@ -28,99 +28,27 @@ module Drntest
       def run(argv=nil)
         argv ||= ARGV.dup
         tester = new
-        option_parser = create_option_parser(tester)
-        targets = option_parser.parse!(argv)
+        *targets = tester.parse_command_line_options(argv)
         tester.run(*targets)
-      end
-
-      private
-      def create_option_parser(tester)
-        parser = OptionParser.new
-
-        parser.banner += " TEST_FILE..."
-
-        parser.on("--port=PORT",
-                  "Connect to fluent-plugin-droonga on PORT",
-                  "(#{tester.port})") do |port|
-          tester.port = port
-        end
-
-        parser.on("--host=HOST",
-                  "Connect to fluent-plugin-droonga on HOST",
-                  "(#{tester.host})") do |host|
-          tester.host = host
-        end
-
-        parser.on("--tag=TAG",
-                  "Send messages to fluent-plugin-droonga with TAG",
-                  "(#{tester.tag})") do |tag|
-          tester.tag = tag
-        end
-
-        parser.on("--base-path=PATH",
-                  "Path to the base directory including test suite, config and fixture",
-                  "(#{tester.base_path})") do |base_path|
-          tester.base_path = Pathname(base_path).expand_path(Dir.pwd)
-        end
-
-        parser.on("--config=NAME",
-                  "Name of the configuration directory for Droonga engine",
-                  "(#{tester.config})") do |config|
-          tester.config = config
-        end
-
-        parser.on("--fluentd=PATH",
-                  "Path to the fluentd executable",
-                  "(#{tester.fluentd})") do |fluentd|
-          tester.fluentd = fluentd
-        end
-
-        parser.on("--fluentd-options=OPTIONS",
-                  "Options for fluentd",
-                  "You can specify this option multiple times") do |options|
-          tester.fluentd_options.concat(Shellwords.split(options))
-        end
-
-        parser.on("--test=PATTERN",
-                  "Run only tests which have a name matched to the given PATTERN") do |pattern|
-          if /\A\/(.+)\/\z/ =~ pattern
-            pattern = Regexp.new($1)
-          end
-          tester.test_pattern = pattern
-        end
-
-        parser.on("--test-suite=PATTERN",
-                  "Run only test suites which have a path matched to the given PATTERN") do |pattern|
-          if /\A\/(.+)\/\z/ =~ pattern
-            pattern = Regexp.new($1)
-          end
-          tester.suite_pattern = pattern
-        end
-
-        parser
       end
     end
 
-    attr_accessor :port, :host, :tag, :fluentd, :fluentd_options
-    attr_accessor :test_pattern, :suite_pattern, :base_path, :config
-
     def initialize
-      @port = 24224
-      @host = "localhost"
-      @tag  = "droonga"
-      @base_path = Pathname(Dir.pwd)
-      @config  = "default"
-      @fluentd = "fluentd"
-      @fluentd_options = []
+      @config = Configuration.new
       @test_pattern = nil
       @suite_pattern = nil
+    end
+
+    def parse_command_line_options(command_line_options)
+      option_parser = create_option_parser
+      option_parser.parse!(command_line_options)
     end
 
     def run(*targets)
       test_suites_result = TestSuitesResult.new
       tests = load_tests(*targets)
       tests.each do |test|
-        test_runner = TestRunner.new(self, test)
+        test_runner = TestRunner.new(@config, test)
         test_suites_result.test_results << test_runner.run
       end
 
@@ -140,8 +68,75 @@ module Drntest
       test_suites_result.success?
     end
 
+    private
+    def create_option_parser
+      parser = OptionParser.new
+
+      parser.banner += " TEST_FILE..."
+
+      parser.on("--port=PORT",
+                "Connect to fluent-plugin-droonga on PORT",
+                "(#{@config.port})") do |port|
+        @config.port = port
+      end
+
+      parser.on("--host=HOST",
+                "Connect to fluent-plugin-droonga on HOST",
+                "(#{@config.host})") do |host|
+        @config.host = host
+      end
+
+      parser.on("--tag=TAG",
+                "Send messages to fluent-plugin-droonga with TAG",
+                "(#{@config.tag})") do |tag|
+        @config.tag = tag
+      end
+
+      parser.on("--base-path=PATH",
+                "Path to the base directory including test suite, config and fixture",
+                "(#{@config.base_path})") do |base_path|
+        @config.base_path = Pathname(base_path).expand_path(Dir.pwd)
+      end
+
+      parser.on("--config=NAME",
+                "Name of the configuration directory for Droonga engine",
+                "(#{@config.engine_config})") do |config|
+        @config.engine_config = config
+      end
+
+      parser.on("--fluentd=PATH",
+                "Path to the fluentd executable",
+                "(#{@config.fluentd})") do |fluentd|
+        @config.fluentd = fluentd
+      end
+
+      parser.on("--fluentd-options=OPTIONS",
+                "Options for fluentd",
+                "You can specify this option multiple times") do |options|
+        @config.fluentd_options.concat(Shellwords.split(options))
+      end
+
+      parser.on("--test=PATTERN",
+                "Run only tests which have a name matched to the given PATTERN") do |pattern|
+        if /\A\/(.+)\/\z/ =~ pattern
+          pattern = Regexp.new($1)
+        end
+        @test_pattern = pattern
+      end
+
+      parser.on("--test-suite=PATTERN",
+                "Run only test suites which have a path matched to the given PATTERN") do |pattern|
+        if /\A\/(.+)\/\z/ =~ pattern
+          pattern = Regexp.new($1)
+        end
+        @suite_pattern = pattern
+      end
+
+      parser
+    end
+
     def load_tests(*targets)
-      suite_path = @base_path + Path::SUITE
+      suite_path = @config.suite_path
       targets << suite_path if targets.empty?
 
       tests = []

@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Droonga Project
+# Copyright (C) 2013-2014  Droonga Project
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,10 +18,8 @@ require "drntest/directive"
 
 module Drntest
   class TestLoader
-    attr_reader :owner, :test_path
-
-    def initialize(owner, test_path)
-      @owner = owner
+    def initialize(config, test_path)
+      @config = config
       @test_path = test_path
     end
 
@@ -33,7 +31,7 @@ module Drntest
     def resolve_relative_path(path)
       path = path.to_s
       path = path[2..-1] if path[0..1] == "./"
-      Pathname(path).expand_path(@owner.base_path)
+      Pathname(path).expand_path(@config.base_path)
     end
 
     def load_test_file(path)

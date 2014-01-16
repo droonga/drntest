@@ -20,16 +20,8 @@ require "fileutils"
 
 module Drntest
   class Engine
-    attr_reader :fluentd, :fluentd_options
-
-    def initialize(params)
-      @base_path = params[:base_path]
-      @config_dir = params[:config_dir]
-      @default_port = params[:default_port]
-      @default_host = params[:default_host]
-      @default_tag = params[:default_tag]
-      @fluentd = params[:fluentd]
-      @fluentd_options = params[:fluentd_options]
+    def initialize(config)
+      @config = config
     end
 
     def start
@@ -42,23 +34,11 @@ module Drntest
     end
 
     def config_file
-      @config_dir + "fluentd.conf"
+      @config.engine_config_path + "fluentd.conf"
     end
 
     def catalog_file
-      @config_dir + "catalog.json"
-    end
-
-    def port
-      @port || @default_port
-    end
-
-    def host
-      @host || @default_host
-    end
-
-    def tag
-      @tag || @default_tag
+      @config.engine_config_path + "catalog.json"
     end
 
     private
@@ -67,9 +47,9 @@ module Drntest
         catalog_json = JSON.parse(catalog_file.read, :symbolize_names => true)
         zone = catalog_json[:zones].first
         /\A([^:]+):(\d+)\/(.+)\z/ =~ zone
-        @host = "localhost" # $1
-        @port = $2.to_i
-        @tag  = $3
+        @config.host = "localhost" # $1
+        @config.port = $2.to_i
+        @config.tag  = $3
       end
     end
 
@@ -84,9 +64,9 @@ module Drntest
       FileUtils.cp(catalog_file, temporary_catalog)
 
       command = [
-        @fluentd,
+        @config.fluentd,
         "--config", temporary_config.to_s,
-        *@fluentd_options,
+        *@config.fluentd_options,
       ]
       env = {
         "DROONGA_CATALOG" => temporary_catalog.to_s,
@@ -126,7 +106,7 @@ module Drntest
     end
 
     def temporary_base_dir
-      @base_path + "tmp"
+      @config.base_path + "tmp"
     end
 
     def temporary_dir
@@ -134,12 +114,12 @@ module Drntest
     end
 
     def temporary?
-      @fluentd && config_file.exist?
+      @config.fluentd && config_file.exist?
     end
 
     def ready?
       begin
-        socket = TCPSocket.new(@host, @port)
+        socket = TCPSocket.new(@config.host, @config.port)
         socket.close
         true
       rescue Errno::ECONNREFUSED

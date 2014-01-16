@@ -19,7 +19,6 @@ require "tempfile"
 require "pp"
 require "fileutils"
 
-require "drntest/path"
 require "drntest/test-results"
 require "drntest/test-executor"
 require "drntest/json-loader"
@@ -27,19 +26,10 @@ require "drntest/engine"
 
 module Drntest
   class TestRunner
-    attr_reader :owner, :base_path, :target_path
-
-    def initialize(owner, target)
-      @owner = owner
-      @base_path = Pathname(owner.base_path)
+    def initialize(config, target)
+      @config = config
       @target_path = Pathname(target)
-      @engine = Engine.new(:base_path => @base_path,
-                           :config_dir => config_dir,
-                           :default_port => @owner.port,
-                           :default_host => @owner.host,
-                           :default_tag => @owner.tag,
-                           :fluentd => @owner.fluentd,
-                           :fluentd_options => @owner.fluentd_options)
+      @engine = Engine.new(@config)
     end
 
     def run
@@ -53,15 +43,11 @@ module Drntest
       results
     end
 
-    def config_dir
-      (@base_path + Path::CONFIG) + @owner.config
-    end
-
     private
     def process_requests
       results = TestResults.new(@target_path)
 
-      executor = TestExecutor.new(self, @target_path)
+      executor = TestExecutor.new(@config, @target_path)
       results.actuals = executor.execute
       if expected_exist?
         results.expecteds = load_expected_responses

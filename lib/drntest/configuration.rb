@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Droonga Project
+# Copyright (C) 2014  Droonga Project
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,27 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 module Drntest
-  module Path
-    SUITE  = "suite"
-    CONFIG = "config"
+  class Configuration
+    attr_accessor :port, :host, :tag
+    attr_accessor :base_path, :engine_config
+    attr_accessor :fluentd, :fluentd_options
+
+    def initialize
+      @port            = 24224
+      @host            = "localhost"
+      @tag             = "droonga"
+      @base_path       = Pathname(Dir.pwd)
+      @engine_config   = "default"
+      @fluentd         = "fluentd"
+      @fluentd_options = []
+    end
+
+    def suite_path
+      @base_path + "suite"
+    end
+
+    def engine_config_path
+      @base_path + "config" + @engine_config
+    end
   end
 end
