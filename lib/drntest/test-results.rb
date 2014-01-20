@@ -26,19 +26,13 @@ module Drntest
 
     def status
       return :error unless @errors.empty?
+      return :no_response if @actuals.empty?
+      return :not_checked if @expecteds.empty?
 
-      unless @actuals.empty?
-        unless @expecteds.empty?
-          if @actuals == @expecteds
-            :success
-          else
-            :failure
-          end
-        else
-          :not_checked
-        end
+      if @actuals == @expecteds
+        :success
       else
-        :no_response
+        :failure
       end
     end
   end
