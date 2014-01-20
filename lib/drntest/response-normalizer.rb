@@ -37,7 +37,9 @@ module Drntest
 
     def normalize_body!(normalized_response)
       return unless groonga_command?
-      normalize_groonga_command_response!(normalized_response[2])
+      droonga_message = normalized_response[2]
+      normalize_droonga_message!(droonga_message)
+      normalize_groonga_command_response!(droonga_message["body"])
     end
 
     GROONGA_COMMANDS = [
@@ -49,8 +51,14 @@ module Drntest
       GROONGA_COMMANDS.include?(@request["type"])
     end
 
+    def normalize_droonga_message!(message)
+      normalized_in_reply_to = "request-id"
+      in_reply_to = message["inReplyTo"]
+      message["inReplyTo"] = normalized_in_reply_to if in_reply_to
+    end
+
     def normalize_groonga_command_response!(response)
-      normalize_groonga_command_header!(response["body"][0])
+      normalize_groonga_command_header!(response[0])
     end
 
     def normalize_groonga_command_header!(header)
