@@ -24,24 +24,25 @@ module Drntest
       return @response if @response.nil?
 
       normalized_response = @response.dup
-      normalize_envelope!(normalized_response)
-      normalize_body!(normalized_response)
+      normalize_fluent_message!(normalized_response)
+      normalize_droonga_message!(normalized_response[2])
       normalized_response
     end
 
     private
-    def normalize_envelope!(normalized_response)
+    def normalize_fluent_message!(fluent_message)
       normalized_start_time = 0
-      normalized_response[1] = normalized_start_time
+      fluent_message[1] = normalized_start_time
     end
 
-    def normalize_body!(normalized_response)
-      droonga_message = normalized_response[2]
-      normalize_droonga_message!(droonga_message)
+    def normalize_droonga_message!(droonga_message)
+      normalize_droonga_message_envelope!(droonga_message)
+      normalize_droonga_message_body!(droonga_message["body"])
+    end
 
-      if groonga_command?
-        normalize_groonga_command_response!(droonga_message["body"])
-      end
+    def normalize_droonga_message_body!(body)
+      return unless groonga_command?
+      normalize_groonga_command_response!(body)
     end
 
     GROONGA_COMMANDS = [
@@ -53,7 +54,7 @@ module Drntest
       GROONGA_COMMANDS.include?(@request["type"])
     end
 
-    def normalize_droonga_message!(message)
+    def normalize_droonga_message_envelope!(message)
       normalized_in_reply_to = "request-id"
       in_reply_to = message["inReplyTo"]
       message["inReplyTo"] = normalized_in_reply_to if in_reply_to
