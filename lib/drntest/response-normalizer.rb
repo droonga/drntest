@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Droonga Project
+# Copyright (C) 2013-2014  Droonga Project
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,11 +37,7 @@ module Drntest
 
     def normalize_body!(normalized_response)
       return unless groonga_command?
-      begin
-        normalize_groonga_command_response!(normalized_response[2])
-      rescue StandardError => error
-        p error
-      end
+      normalize_groonga_command_response!(normalized_response[2])
     end
 
     GROONGA_COMMANDS = [

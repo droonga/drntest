@@ -48,7 +48,11 @@ module Drntest
       results = TestResults.new(@target_path)
 
       executor = TestExecutor.new(@config, @target_path)
-      results.actuals = executor.execute
+      begin
+        results.actuals = executor.execute
+      rescue
+        results.errors << $!
+      end
       if expected_exist?
         results.expecteds = load_expected_responses
       end
@@ -66,6 +70,9 @@ module Drntest
       when :not_checked
         puts "NOT CHECKED"
         output_actual_file(results.actuals)
+      when :error
+        puts "ERROR"
+        output_errors(results.errors)
       end
 
       results
@@ -156,6 +163,19 @@ module Drntest
       file.write(content)
       file.close
       yield(file)
+    end
+
+    def output_errors(errors)
+      return if errors.empty?
+      n_digits = (Math.log10(errors.size) + 1).ceil
+      mark = "=" * 78
+      errors.each_with_index do |error, i|
+        puts(mark)
+        formatted_nth = "%*d)" % [n_digits, i + 1]
+        puts("#{formatted_nth} #{error.message} (#{error.class})")
+        puts(error.backtrace)
+        puts(mark)
+      end
     end
   end
 end

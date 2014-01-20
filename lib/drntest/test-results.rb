@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Droonga Project
+# Copyright (C) 2013-2014  Droonga Project
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,15 +15,18 @@
 
 module Drntest
   class TestResults
-    attr_accessor :name, :actuals, :expecteds
+    attr_accessor :name, :actuals, :expecteds, :errors
 
     def initialize(name)
       @name = name
       @actuals = []
       @expecteds = []
+      @errors = []
     end
 
     def status
+      return :error unless @errors.empty?
+
       unless @actuals.empty?
         unless @expecteds.empty?
           if @actuals == @expecteds
