@@ -36,10 +36,12 @@ module Drntest
     end
 
     def normalize_body!(normalized_response)
-      return unless groonga_command?
       droonga_message = normalized_response[2]
       normalize_droonga_message!(droonga_message)
-      normalize_groonga_command_response!(droonga_message["body"])
+
+      if groonga_command?
+        normalize_groonga_command_response!(droonga_message["body"])
+      end
     end
 
     GROONGA_COMMANDS = [
