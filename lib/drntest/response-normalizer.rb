@@ -47,6 +47,7 @@ module Drntest
 
     GROONGA_COMMANDS = [
       "table_create",
+      "table_remove",
       "column_create",
       "select",
     ]
