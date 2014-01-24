@@ -79,7 +79,7 @@ module Drntest
       def execute_request(request)
         if @logging
           responses = @client.request(request)
-          responses = [responses] unless responses.is_a?(Array)
+          responses = [responses] unless responses.first.is_a?(Array)
           @responses += responses.collect do |response|
             normalize_response(request, response)
           end
