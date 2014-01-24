@@ -27,10 +27,6 @@ module Drntest
       normalize_fluent_message!(normalized_response)
       normalize_droonga_message!(normalized_response[2])
       normalized_response
-    rescue StandardError => error
-      puts "failed to normalize response"
-      p @response
-      raise error
     end
 
     private
