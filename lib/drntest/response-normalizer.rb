@@ -66,9 +66,9 @@ module Drntest
 
     def normalize_errors(errors)
       normalized_errors = {}
-      error_detials = errors.detials
+      error_details = errors.values
       errors.keys.each_with_index do |source, index|
-        normalized_errors["sources#{index}"] = error_detials[index]
+        normalized_errors["sources#{index}"] = error_details[index]
       end
       normalized_errors
     end
