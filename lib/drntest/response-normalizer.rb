@@ -59,6 +59,18 @@ module Drntest
       normalized_in_reply_to = "request-id"
       in_reply_to = message["inReplyTo"]
       message["inReplyTo"] = normalized_in_reply_to if in_reply_to
+
+      errors = message["errors"]
+      message["errors"] = normalize_errors(errors) if errors
+    end
+
+    def normalize_errors(errors)
+      normalized_errors = {}
+      error_detials = errors.detials
+      errors.keys.each_with_index do |source, index|
+        normalized_errors["sources#{index}"] = error_detials[index]
+      end
+      normalized_errors
     end
 
     def normalize_groonga_command_response!(response)
