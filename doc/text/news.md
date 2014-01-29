@@ -1,5 +1,16 @@
 # News
 
+## 1.1.1: 2014-01-29
+
+### Improvements
+
+  * Improved error report. It is more readable.
+  * Used all received responses from Droonga Engine instead of the
+    first response. You can check too many responses case.
+  * Supported `table_remove` command.
+  * Supported `inReplyTo` field normalization in response.
+  * Supported the latest droonga-client gem.
+
 ## 1.1.0: 2013-12-29
 
 ### Improvements
