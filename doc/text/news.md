@@ -1,6 +1,6 @@
 # News
 
-## 1.1.1: 2014-01-29 {#1-1-1}
+## 1.1.1: 2014-01-29
 
 ### Improvements
 
@@ -11,7 +11,7 @@
   * Supported `inReplyTo` field normalization in response.
   * Supported the latest droonga-client gem.
 
-## 1.1.0: 2013-12-29 {#1-1-0}
+## 1.1.0: 2013-12-29
 
 ### Improvements
 
@@ -25,6 +25,6 @@
     asynchronously.
   * Made 2x times faster by using tmpfs if available.
 
-## 1.0.0: 2013-11-29 {#1-0-0}
+## 1.0.0: 2013-11-29
 
 The first release!!!
