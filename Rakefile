@@ -17,7 +17,6 @@
 
 task :default => :test
 
-require "rubygems"
 require "bundler/gem_helper"
 
 base_dir = File.join(File.dirname(__FILE__))
