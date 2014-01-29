@@ -1,6 +1,6 @@
 # -*- mode: ruby; coding: utf-8 -*-
 #
-# Copyright (C) 2013  Droonga Project
+# Copyright (C) 2013-2014  Droonga Project
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 task :default => :test
 
 require "bundler/gem_helper"
+require "packnga"
 
 base_dir = File.join(File.dirname(__FILE__))
 
@@ -28,6 +29,11 @@ end
 
 helper.install
 spec = helper.gemspec
+
+Packnga::DocumentTask.new(spec) do |task|
+  task.original_language = "en"
+  task.translate_languages = ["ja"]
+end
 
 desc "Run tests"
 task :test do
