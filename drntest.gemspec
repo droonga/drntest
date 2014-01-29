@@ -42,7 +42,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency("json")
   spec.add_runtime_dependency("yajl-ruby")
-  spec.add_runtime_dependency("droonga-client", ">= 0.1.0")
+  spec.add_runtime_dependency("droonga-client", ">= 0.1.1")
 
   spec.add_development_dependency("bundler")
   spec.add_development_dependency("rake")
