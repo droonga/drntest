@@ -78,6 +78,7 @@ module Drntest
     end
 
     def normalize_groonga_command_header!(header)
+      return unless header.is_a?(Array)
       normalized_start_time = 0.0
       normalized_elapsed = 0.0
       header[1] = normalized_start_time if valid_start_time?(header[1])
