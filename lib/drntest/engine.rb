@@ -43,13 +43,32 @@ module Drntest
 
     private
     def prepare
-      if catalog_file.exist?
-        catalog_json = JSON.parse(catalog_file.read, :symbolize_names => true)
-        zone = catalog_json[:zones].first
+      return unless catalog_file.exist?
+
+      catalog_json = JSON.parse(catalog_file.read)
+      case catalog_json["version"]
+      when 1
+        zone = catalog_json["zones"].first
         /\A([^:]+):(\d+)\/(.+)\z/ =~ zone
         @config.host = "localhost" # $1
         @config.port = $2.to_i
         @config.tag  = $3
+      when 2
+        catch do |tag|
+          datasets = catalog_json["datasets"]
+          datasets.each do |name, dataset|
+            dataset["replicas"].each do |replica|
+              replica["slices"].each do |slice|
+                if /\A([^:]+):(\d+)\/([^.]+)/ =~ slice["volume"]["address"]
+                  @config.host = "localhost" # $1
+                  @config.port = $2.to_i
+                  @config.tag  = $3
+                  throw(tag)
+                end
+              end
+            end
+          end
+        end
       end
     end
 
