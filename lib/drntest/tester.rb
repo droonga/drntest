@@ -53,15 +53,6 @@ module Drntest
       end
 
       puts
-      puts "==== Test Results ===="
-      test_suites_result.test_results.each do |result|
-        puts "%s: %s" % [
-          result.name,
-          result.status
-        ]
-      end
-
-      puts
       puts "==== Summary ===="
       p test_suites_result.summary
 
