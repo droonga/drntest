@@ -1,5 +1,12 @@
 # News
 
+## 1.1.2: 2014-02-28
+
+### Improvements
+
+  * Supported catalog.json version2.
+  * Simplified test result report a bit.
+
 ## 1.1.1: 2014-01-29
 
 ### Improvements
