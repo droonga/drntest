@@ -84,19 +84,19 @@ module Drntest
     end
 
     def extract_connection_info_catalog_v2(catalog_json)
-        datasets = catalog_json["datasets"]
-        datasets.each do |name, dataset|
-          dataset["replicas"].each do |replica|
-            replica["slices"].each do |slice|
-              if /\A([^:]+):(\d+)\/([^.]+)/ =~ slice["volume"]["address"]
-                @config.host = "localhost" # $1
-                @config.port = $2.to_i
-                @config.tag  = $3
-                return
-              end
+      datasets = catalog_json["datasets"]
+      datasets.each do |name, dataset|
+        dataset["replicas"].each do |replica|
+          replica["slices"].each do |slice|
+            if /\A([^:]+):(\d+)\/([^.]+)/ =~ slice["volume"]["address"]
+              @config.host = "localhost" # $1
+              @config.port = $2.to_i
+              @config.tag  = $3
+              return
             end
           end
         end
+      end
     end
 
     def setup(target_path)
