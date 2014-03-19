@@ -47,34 +47,34 @@ module Drntest
       data = ""
       Pathname(path).open do |input|
         input.each_line do |line|
-        data << line
-        case line.chomp
-        when /\A\#\@([^\s]+)/
-          type = $1
-          options = Shellwords.split($POSTMATCH.strip)
-          directive = parse_directive(type, options)
-          case directive
-          when UnknownDirective
-            raise InputError.new(path, input.lineno, line,
-                                 "unknown directive: <#{directive.type}>")
-          when IncludeDirective
-            included = resolve_relative_path(directive.path)
-            included_operations = load_test_file(included)
-            operations += included_operations
+          data << line
+          case line.chomp
+          when /\A\#\@([^\s]+)/
+            type = $1
+            options = Shellwords.split($POSTMATCH.strip)
+            directive = parse_directive(type, options)
+            case directive
+            when UnknownDirective
+              raise InputError.new(path, input.lineno, line,
+                                   "unknown directive: <#{directive.type}>")
+            when IncludeDirective
+              included = resolve_relative_path(directive.path)
+              included_operations = load_test_file(included)
+              operations += included_operations
+            else
+              operations << directive
+            end
+          when /\A\#/
+            # comment
           else
-            operations << directive
-          end
-        when /\A\#/
-          # comment
-        else
-          begin
-            parser << line
-          rescue Yajl::ParseError => error
-            JSONLoader.report_error(path, data, error)
-            raise error
+            begin
+              parser << line
+            rescue Yajl::ParseError => error
+              JSONLoader.report_error(path, data, error)
+              raise error
+            end
           end
         end
-      end
       end
       operations
     end
