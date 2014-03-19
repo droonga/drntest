@@ -49,23 +49,31 @@ module Drntest
       @config.catalog_version = catalog_json["version"]
       case @config.catalog_version
       when 1
-        zone = catalog_json["zones"].first
-        /\A([^:]+):(\d+)\/(.+)\z/ =~ zone
-        @config.host = "localhost" # $1
-        @config.port = $2.to_i
-        @config.tag  = $3
+        prepare_catalog_v1(catalog_json)
       when 2
-        catch do |tag|
-          datasets = catalog_json["datasets"]
-          datasets.each do |name, dataset|
-            dataset["replicas"].each do |replica|
-              replica["slices"].each do |slice|
-                if /\A([^:]+):(\d+)\/([^.]+)/ =~ slice["volume"]["address"]
-                  @config.host = "localhost" # $1
-                  @config.port = $2.to_i
-                  @config.tag  = $3
-                  throw(tag)
-                end
+        prepare_catalog_v2(catalog_json)
+      end
+    end
+
+    def prepare_catalog_v1(catalog_json)
+      zone = catalog_json["zones"].first
+      /\A([^:]+):(\d+)\/(.+)\z/ =~ zone
+      @config.host = "localhost" # $1
+      @config.port = $2.to_i
+      @config.tag  = $3
+    end
+
+    def prepare_catalog_v2(catalog_json)
+      catch do |tag|
+        datasets = catalog_json["datasets"]
+        datasets.each do |name, dataset|
+          dataset["replicas"].each do |replica|
+            replica["slices"].each do |slice|
+              if /\A([^:]+):(\d+)\/([^.]+)/ =~ slice["volume"]["address"]
+                @config.host = "localhost" # $1
+                @config.port = $2.to_i
+                @config.tag  = $3
+                throw(tag)
               end
             end
           end
