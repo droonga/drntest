@@ -82,7 +82,7 @@ module Drntest
     def parse_directive(type, options)
       case normalize_directive_type(type)
       when :include
-        IncludeDirective.new(value)
+        IncludeDirective.new(options.first)
       when :enable_logging
         EnableLoggingDirective.new
       when :disable_logging
