@@ -23,6 +23,7 @@ require "drntest/test-results"
 require "drntest/test-executor"
 require "drntest/json-loader"
 require "drntest/engine"
+require "drntest/input-error"
 
 module Drntest
   class TestRunner
@@ -170,8 +171,12 @@ module Drntest
       errors.each_with_index do |error, i|
         puts(mark)
         formatted_nth = "%*d)" % [n_digits, i + 1]
-        puts("#{formatted_nth} #{error.message} (#{error.class})")
-        puts(error.backtrace)
+        if error.is_a?(InputError)
+          puts("#{formatted_nth} #{error.message}")
+        else
+          puts("#{formatted_nth} #{error.message} (#{error.class})")
+          puts(error.backtrace)
+        end
         puts(mark)
       end
     end

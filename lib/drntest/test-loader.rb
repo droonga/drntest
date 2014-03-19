@@ -15,6 +15,7 @@
 
 require "drntest/json-loader"
 require "drntest/directive"
+require "drntest/input-error"
 
 module Drntest
   class TestLoader
@@ -41,13 +42,14 @@ module Drntest
         operations << operation
       end
       data = ""
-      Pathname(path).read.each_line do |line|
+      Pathname(path).open do |input|
+        input.each_line do |line|
         data << line
         case line.chomp
         when /\A\#\@([^\s]+)(?:\s+(.+))?\z/
           type = $1
           value = $2
-          directive = parse_directive(type, value)
+          directive = parse_directive(type, value, path, input.lineno, line)
           if directive.is_a?(IncludeDirective)
             included = resolve_relative_path(directive.path)
             included_operations = load_test_file(included)
@@ -66,10 +68,11 @@ module Drntest
           end
         end
       end
+      end
       operations
     end
 
-    def parse_directive(type, value)
+    def parse_directive(type, value, path, line_number, content)
       case normalize_directive_type(type)
       when :include
         IncludeDirective.new(value)
@@ -80,7 +83,8 @@ module Drntest
       when :omit
         OmitDirective.new(value)
       else
-        raise "unknown directive: #{type}"
+        raise InputError.new(path, line_number, content,
+                             "unknown directive: <#{type}>")
       end
     end
 
