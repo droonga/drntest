@@ -47,12 +47,8 @@ module Drntest
     def process_requests
       results = TestResults.new(@target_path)
 
-      executor = TestExecutor.new(@config, @target_path)
-      begin
-        results.actuals = executor.execute
-      rescue
-        results.errors << $!
-      end
+      executor = TestExecutor.new(@config, @target_path, results)
+      executor.execute
       if expected_exist?
         results.expecteds = load_expected_responses
       end
@@ -73,6 +69,8 @@ module Drntest
       when :error
         puts "ERROR"
         output_errors(results.errors)
+      when :omitted
+        puts "OMITTED: #{results.omit_message}"
       end
 
       results

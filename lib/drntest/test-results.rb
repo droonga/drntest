@@ -16,15 +16,19 @@
 module Drntest
   class TestResults
     attr_accessor :name, :actuals, :expecteds, :errors
+    attr_reader :omit_message
 
     def initialize(name)
       @name = name
       @actuals = []
       @expecteds = []
       @errors = []
+      @omitted = false
+      @omit_message = nil
     end
 
     def status
+      return :omitted if @omitted
       return :error unless @errors.empty?
       return :no_response if @actuals.empty?
       return :not_checked if @expecteds.empty?
@@ -34,6 +38,11 @@ module Drntest
       else
         :failure
       end
+    end
+
+    def omit(message)
+      @omitted = true
+      @omit_message = message
     end
   end
 end

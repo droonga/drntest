@@ -20,19 +20,25 @@ require "drntest/response-normalizer"
 
 module Drntest
   class TestExecutor
-    def initialize(config, test_path)
+    def initialize(config, test_path, results)
       @config = config
       @test_path = test_path
+      @results = results
     end
 
     def execute
-      Droonga::Client.open(tag: @config.tag, port: @config.port) do |client|
-        context = Context.new(client)
-        operations.each do |operation|
-          context.execute(operation)
+      catch do |abort_tag|
+        begin
+          Droonga::Client.open(tag: @config.tag, port: @config.port) do |client|
+            context = Context.new(client, @results, abort_tag)
+            operations.each do |operation|
+              context.execute(operation)
+            end
+            context.finish
+          end
+        rescue
+          @results.errors << $!
         end
-        context.finish
-        context.responses
       end
     end
 
@@ -43,10 +49,10 @@ module Drntest
     end
 
     class Context
-      attr_reader :responses
-
-      def initialize(client)
+      def initialize(client, results, abort_tag)
         @client = client
+        @results = results
+        @abort_tag = abort_tag
         @requests = []
         @responses = []
         @logging = true
@@ -63,6 +69,7 @@ module Drntest
 
       def finish
         consume_requests
+        @results.actuals = @responses
       end
 
       private
@@ -73,6 +80,9 @@ module Drntest
           consume_requests
         when :disable_logging
           @logging = false
+        when :omit
+          @results.omit(directive.value)
+          abort_execution
         end
       end
 
@@ -109,6 +119,10 @@ module Drntest
       def normalize_response(request, response)
         normalizer = ResponseNormalizer.new(request, response)
         normalizer.normalize
+      end
+
+      def abort_execution
+        throw(@abort_tag)
       end
     end
   end
