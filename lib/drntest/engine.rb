@@ -24,8 +24,8 @@ module Drntest
       @config = config
     end
 
-    def start
-      prepare
+    def start(target_path)
+      prepare(target_path)
       setup
     end
 
@@ -42,7 +42,7 @@ module Drntest
     end
 
     private
-    def prepare
+    def prepare(target_path)
       return unless catalog_file.exist?
 
       catalog_json = JSON.parse(catalog_file.read)
@@ -51,6 +51,14 @@ module Drntest
       when 1
         prepare_catalog_v1(catalog_json)
       when 2
+        custom_catalog_json_file = target_path.sub_ext(".catalog.json")
+        if custom_catalog_json_file.exist?
+          custom_catalog_json = JSON.parse(custom_catalog_json_file.read)
+          merge_catalog_v2!(catalog_json, custom_catalog_json)
+          catalog_file.open("w") do |output|
+            output.puts(JSON.generate(catalog_json))
+          end
+        end
         prepare_catalog_v2(catalog_json)
       end
     end
@@ -61,6 +69,23 @@ module Drntest
       @config.host = "localhost" # $1
       @config.port = $2.to_i
       @config.tag  = $3
+    end
+
+    def merge_catalog_v2!(catalog_json, custom_catalog_json)
+      base_datasets = catalog_json["datasets"]
+      custom_catalog_json["datasets"].each do |name, dataset|
+        base_dataset = base_datasets[name]
+        if base_dataset
+          base_dataset["schema"] = dataset["schema"] || base_dataset["schema"]
+          replicas = dataset["replicas"] || []
+          base_replicas = base_dataset["replicas"]
+          replicas.each_with_index do |replica, i|
+            base_replicas[i].merge!(replica)
+          end
+        else
+          base_datasets[name] = dataset
+        end
+      end
     end
 
     def prepare_catalog_v2(catalog_json)

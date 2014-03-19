@@ -35,7 +35,7 @@ module Drntest
 
     def run
       print "#{@target_path}: "
-      @engine.start
+      @engine.start(@target_path)
       begin
         results = process_requests
       ensure
