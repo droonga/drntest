@@ -25,8 +25,8 @@ module Drntest
     end
 
     def start(target_path)
-      prepare(target_path)
-      setup
+      catalog_json = prepare(target_path)
+      setup(catalog_json)
     end
 
     def stop
@@ -43,8 +43,6 @@ module Drntest
 
     private
     def prepare(target_path)
-      return unless catalog_file.exist?
-
       catalog_json = JSON.parse(catalog_file.read)
       @config.catalog_version = catalog_json["version"]
       case @config.catalog_version
@@ -55,12 +53,10 @@ module Drntest
         if custom_catalog_json_file.exist?
           custom_catalog_json = JSON.parse(custom_catalog_json_file.read)
           merge_catalog_v2!(catalog_json, custom_catalog_json)
-          catalog_file.open("w") do |output|
-            output.puts(JSON.generate(catalog_json))
-          end
         end
         prepare_catalog_v2(catalog_json)
       end
+      catalog_json
     end
 
     def prepare_catalog_v1(catalog_json)
@@ -106,7 +102,7 @@ module Drntest
       end
     end
 
-    def setup
+    def setup(catalog_json)
       return unless temporary?
 
       setup_temporary_dir
@@ -114,7 +110,9 @@ module Drntest
       temporary_config = temporary_dir + "fluentd.conf"
       FileUtils.cp(config_file, temporary_config)
       temporary_catalog = temporary_dir + "catalog.json"
-      FileUtils.cp(catalog_file, temporary_catalog)
+      temporary_catalog.open("w") do |output|
+        output.puts(JSON.pretty_generate(catalog_json))
+      end
 
       command = [
         @config.fluentd,
