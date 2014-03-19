@@ -15,16 +15,27 @@
 
 module Drntest
   class Directive
-    attr_reader :type, :value
+  end
 
-    def initialize(type, value)
-      @type = normalize_type(type)
-      @value = value
+  class IncludeDirective < Directive
+    attr_reader :path
+
+    def initialize(path)
+      @path = path
     end
+  end
 
-    private
-    def normalize_type(type)
-      type.gsub("-", "_").to_sym
+  class EnableLoggingDirective < Directive
+  end
+
+  class DisableLoggingDirective < Directive
+  end
+
+  class OmitDirective < Directive
+    attr_reader :message
+
+    def initialize(message)
+      @message = message
     end
   end
 end

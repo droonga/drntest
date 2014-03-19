@@ -47,9 +47,9 @@ module Drntest
         when /\A\#\@([^\s]+)(?:\s+(.+))?\z/
           type = $1
           value = $2
-          directive = Directive.new(type, value)
-          if directive.type == :include
-            included = resolve_relative_path(directive.value)
+          directive = parse_directive(type, value)
+          if directive.is_a?(IncludeDirective)
+            included = resolve_relative_path(directive.path)
             included_operations = load_test_file(included)
             operations += included_operations
           else
@@ -67,6 +67,25 @@ module Drntest
         end
       end
       operations
+    end
+
+    def parse_directive(type, value)
+      case normalize_directive_type(type)
+      when :include
+        IncludeDirective.new(value)
+      when :enable_logging
+        EnableLoggingDirective.new
+      when :disable_logging
+        DisableLoggingDirective.new
+      when :omit
+        OmitDirective.new(value)
+      else
+        raise "unknown directive: #{type}"
+      end
+    end
+
+    def normalize_directive_type(type)
+      type.gsub("-", "_").to_sym
     end
   end
 end

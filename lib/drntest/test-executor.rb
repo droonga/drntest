@@ -74,14 +74,14 @@ module Drntest
 
       private
       def execute_directive(directive)
-        case directive.type
-        when :enable_logging
+        case directive
+        when EnableLoggingDirective
           @logging = true
           consume_requests
-        when :disable_logging
+        when DisableLoggingDirective
           @logging = false
-        when :omit
-          @results.omit(directive.value)
+        when OmitDirective
+          @results.omit(directive.message)
           abort_execution
         end
       end
