@@ -17,6 +17,15 @@ module Drntest
   class Directive
   end
 
+  class UnknownDirective < Directive
+    attr_reader :type, :options
+
+    def initialize(type, options)
+      @type = type
+      @options = options
+    end
+  end
+
   class IncludeDirective < Directive
     attr_reader :path
 

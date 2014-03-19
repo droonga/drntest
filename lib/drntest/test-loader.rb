@@ -52,8 +52,12 @@ module Drntest
         when /\A\#\@([^\s]+)/
           type = $1
           options = Shellwords.split($POSTMATCH.strip)
-          directive = parse_directive(type, options, path, input.lineno, line)
-          if directive.is_a?(IncludeDirective)
+          directive = parse_directive(type, options)
+          case directive
+          when UnknownDirective
+            raise InputError.new(path, input.lineno, line,
+                                 "unknown directive: <#{directive.type}>")
+          when IncludeDirective
             included = resolve_relative_path(directive.path)
             included_operations = load_test_file(included)
             operations += included_operations
@@ -75,7 +79,7 @@ module Drntest
       operations
     end
 
-    def parse_directive(type, options, path, line_number, content)
+    def parse_directive(type, options)
       case normalize_directive_type(type)
       when :include
         IncludeDirective.new(value)
@@ -86,8 +90,7 @@ module Drntest
       when :omit
         OmitDirective.new(options.first)
       else
-        raise InputError.new(path, line_number, content,
-                             "unknown directive: <#{type}>")
+        UnknownDirective.new(type, options)
       end
     end
 
