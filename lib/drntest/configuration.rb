@@ -18,6 +18,7 @@ module Drntest
     attr_accessor :port, :host, :tag
     attr_accessor :base_path, :engine_config
     attr_accessor :fluentd, :fluentd_options
+    attr_accessor :catalog_version
 
     def initialize
       @port            = 24224
@@ -27,6 +28,7 @@ module Drntest
       @engine_config   = "default"
       @fluentd         = "fluentd"
       @fluentd_options = []
+      @catalog_version = "2"
     end
 
     def suite_path

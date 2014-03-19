@@ -89,6 +89,8 @@ module Drntest
         DisableLoggingDirective.new
       when :omit
         OmitDirective.new(options.first)
+      when :require_catalog_version
+        RequireCatalogVersionDirective.new(Integer(options.first))
       else
         UnknownDirective.new(type, options)
       end

@@ -46,7 +46,8 @@ module Drntest
       return unless catalog_file.exist?
 
       catalog_json = JSON.parse(catalog_file.read)
-      case catalog_json["version"]
+      @config.catalog_version = catalog_json["version"]
+      case @config.catalog_version
       when 1
         zone = catalog_json["zones"].first
         /\A([^:]+):(\d+)\/(.+)\z/ =~ zone

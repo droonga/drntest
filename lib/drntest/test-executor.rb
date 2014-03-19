@@ -30,7 +30,7 @@ module Drntest
       catch do |abort_tag|
         begin
           Droonga::Client.open(tag: @config.tag, port: @config.port) do |client|
-            context = Context.new(client, @results, abort_tag)
+            context = Context.new(client, @config, @results, abort_tag)
             operations.each do |operation|
               context.execute(operation)
             end
@@ -49,8 +49,9 @@ module Drntest
     end
 
     class Context
-      def initialize(client, results, abort_tag)
+      def initialize(client, config, results, abort_tag)
         @client = client
+        @config = config
         @results = results
         @abort_tag = abort_tag
         @requests = []
@@ -83,6 +84,14 @@ module Drntest
         when OmitDirective
           @results.omit(directive.message)
           abort_execution
+        when RequireCatalogVersionDirective
+          if @config.catalog_version < directive.version
+            message =
+              "require catalog version #{directive.version} or later: " +
+              "<#{@config.catalog_version}>"
+            @results.omit(message)
+            abort_execution
+          end
         end
       end
 

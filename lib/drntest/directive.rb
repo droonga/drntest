@@ -47,4 +47,12 @@ module Drntest
       @message = message
     end
   end
+
+  class RequireCatalogVersionDirective < Directive
+    attr_reader :version
+
+    def initialize(version)
+      @version = version
+    end
+  end
 end
