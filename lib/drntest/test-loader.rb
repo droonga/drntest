@@ -13,6 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+require "English"
+require "shellwords"
+
 require "drntest/json-loader"
 require "drntest/directive"
 require "drntest/input-error"
@@ -46,10 +49,10 @@ module Drntest
         input.each_line do |line|
         data << line
         case line.chomp
-        when /\A\#\@([^\s]+)(?:\s+(.+))?\z/
+        when /\A\#\@([^\s]+)/
           type = $1
-          value = $2
-          directive = parse_directive(type, value, path, input.lineno, line)
+          options = Shellwords.split($POSTMATCH.strip)
+          directive = parse_directive(type, options, path, input.lineno, line)
           if directive.is_a?(IncludeDirective)
             included = resolve_relative_path(directive.path)
             included_operations = load_test_file(included)
@@ -72,7 +75,7 @@ module Drntest
       operations
     end
 
-    def parse_directive(type, value, path, line_number, content)
+    def parse_directive(type, options, path, line_number, content)
       case normalize_directive_type(type)
       when :include
         IncludeDirective.new(value)
@@ -81,7 +84,7 @@ module Drntest
       when :disable_logging
         DisableLoggingDirective.new
       when :omit
-        OmitDirective.new(value)
+        OmitDirective.new(options.first)
       else
         raise InputError.new(path, line_number, content,
                              "unknown directive: <#{type}>")
