@@ -84,7 +84,6 @@ module Drntest
     end
 
     def extract_connection_info_catalog_v2(catalog_json)
-      catch do |tag|
         datasets = catalog_json["datasets"]
         datasets.each do |name, dataset|
           dataset["replicas"].each do |replica|
@@ -93,12 +92,11 @@ module Drntest
                 @config.host = "localhost" # $1
                 @config.port = $2.to_i
                 @config.tag  = $3
-                throw(tag)
+                return
               end
             end
           end
         end
-      end
     end
 
     def setup(target_path)
