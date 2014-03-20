@@ -71,6 +71,7 @@ module Drntest
       custom_catalog_json["datasets"].each do |name, dataset|
         base_dataset = base_datasets[name]
         if base_dataset
+          base_dataset["fact"] = dataset["fact"] || base_dataset["fact"]
           base_dataset["schema"] = dataset["schema"] || base_dataset["schema"]
           replicas = dataset["replicas"] || []
           base_replicas = base_dataset["replicas"]
