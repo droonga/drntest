@@ -62,11 +62,11 @@ module Drntest
         puts "NO RESPONSE"
       when :failure
         puts "FAILURE"
-        output_reject_file(results.actuals)
+        save_reject_file(results.actuals)
         show_diff(results.expecteds, results.actuals)
       when :not_checked
         puts "NOT CHECKED"
-        output_actual_file(results.actuals)
+        save_actual_file(results.actuals)
       when :error
         puts "ERROR"
         output_errors(results.errors)
@@ -106,20 +106,24 @@ module Drntest
       FileUtils.rm_rf(reject_path, :secure => true)
     end
 
-    def output_reject_file(results)
-      output_results(results, reject_path)
+    def save_reject_file(results)
+      save_results(results, reject_path)
     end
 
-    def output_actual_file(results)
-      output_results(results, actual_path)
+    def save_actual_file(results)
+      save_results(results, actual_path)
     end
 
-    def output_results(results, output_path)
+    def save_results(results, output_path)
       puts "Saving received results as #{output_path}"
       File.open(output_path, "w") do |file|
-        results.each do |result|
-          file.puts(format_result(result))
-        end
+        output_results(results, file)
+      end
+    end
+
+    def output_results(results, output)
+      results.each do |result|
+        output.puts(format_result(result))
       end
     end
 
