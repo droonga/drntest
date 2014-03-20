@@ -67,6 +67,7 @@ module Drntest
       when :not_checked
         puts "NOT CHECKED"
         save_actual_file(results.actuals)
+        output_results(results.actuals, $stdout)
       when :error
         puts "ERROR"
         output_errors(results.errors)
