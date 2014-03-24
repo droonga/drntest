@@ -4,7 +4,7 @@
 
 ### Improvements
 
-  * Supported merging custom catalog.json for each test.
+  * Supported merging custom `catalog.json` for each test.
   * Saved actual results on "not checked" cases.
   * Supported a new `omit` directive.
   * Supported a new `require-catalog-version` directive.
@@ -13,7 +13,7 @@
 
 ### Improvements
 
-  * Supported catalog.json version2.
+  * Supported `catalog.json` version2.
   * Simplified test result report a bit.
 
 ## 1.1.1: 2014-01-29
