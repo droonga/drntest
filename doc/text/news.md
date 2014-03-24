@@ -1,5 +1,14 @@
 # News
 
+## 1.1.3: 2014-03-29 (planned)
+
+### Improvements
+
+  * Supported merging custom catalog.json for each test.
+  * Saved actual results on "not checked" cases.
+  * Supported a new `omit` directive.
+  * Supported a new `require-catalog-version` directive.
+
 ## 1.1.2: 2014-02-28
 
 ### Improvements
