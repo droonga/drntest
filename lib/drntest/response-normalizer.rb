@@ -41,8 +41,11 @@ module Drntest
     end
 
     def normalize_droonga_message_body!(body)
-      return unless groonga_command?
-      normalize_groonga_command_response!(body)
+      if groonga_command?
+        normalize_groonga_command_response!(body)
+      elsif search_command?
+        normalize_search_command_response!(body)
+      end
     end
 
     GROONGA_COMMANDS = [
@@ -53,6 +56,10 @@ module Drntest
     ]
     def groonga_command?
       GROONGA_COMMANDS.include?(@request["type"])
+    end
+
+    def search_command?
+      @request["type"] == "search"
     end
 
     def normalize_droonga_message_envelope!(message)
@@ -77,12 +84,26 @@ module Drntest
       normalize_groonga_command_header!(response[0])
     end
 
+    def normalized_start_time
+      0.0
+    end
+
+    def normalized_elapsed
+      0.0
+    end
+
     def normalize_groonga_command_header!(header)
       return unless header.is_a?(Array)
-      normalized_start_time = 0.0
-      normalized_elapsed = 0.0
       header[1] = normalized_start_time if valid_start_time?(header[1])
       header[2] = normalized_elapsed if valid_elapsed?(header[2])
+    end
+
+    def normalize_search_command_response!(response)
+      response.each do |query_name, result|
+        if valid_elapsed?(result["elapsedTime"])
+          result["elapsedTime"] = normalized_elapsed
+        end
+      end
     end
 
     def valid_start_time?(start_time)
