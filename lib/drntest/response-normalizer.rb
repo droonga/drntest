@@ -24,17 +24,11 @@ module Drntest
       return @response if @response.nil?
 
       normalized_response = @response.dup
-      normalize_fluent_message!(normalized_response)
-      normalize_droonga_message!(normalized_response[2])
+      normalize_droonga_message!(normalized_response)
       normalized_response
     end
 
     private
-    def normalize_fluent_message!(fluent_message)
-      normalized_start_time = 0
-      fluent_message[1] = normalized_start_time
-    end
-
     def normalize_droonga_message!(droonga_message)
       normalize_droonga_message_envelope!(droonga_message)
       normalize_droonga_message_body!(droonga_message["body"])
