@@ -61,7 +61,7 @@ module Drntest
     def extract_connection_info_catalog_v1(catalog_json)
       zone = catalog_json["zones"].first
       /\A([^:]+):(\d+)\/(.+)\z/ =~ zone
-      @config.host = "localhost" # $1
+      @config.host = $1
       @config.port = $2.to_i
       @config.tag  = $3
     end
@@ -90,7 +90,7 @@ module Drntest
         dataset["replicas"].each do |replica|
           replica["slices"].each do |slice|
             if /\A([^:]+):(\d+)\/([^.]+)/ =~ slice["volume"]["address"]
-              @config.host = "localhost" # $1
+              @config.host = $1
               @config.port = $2.to_i
               @config.tag  = $3
               return
