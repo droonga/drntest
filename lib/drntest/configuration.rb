@@ -17,7 +17,7 @@ module Drntest
   class Configuration
     attr_accessor :port, :host, :tag
     attr_accessor :base_path, :engine_config
-    attr_accessor :fluentd, :fluentd_options
+    attr_accessor :droonga_engine, :droonga_engine_options
     attr_accessor :catalog_version
 
     def initialize
@@ -26,8 +26,8 @@ module Drntest
       @tag             = "droonga"
       @base_path       = Pathname(Dir.pwd)
       @engine_config   = "default"
-      @fluentd         = "fluentd"
-      @fluentd_options = []
+      @droonga_engine  = "droonga-engine"
+      @droonga_engine_options = []
       @catalog_version = "2"
     end
 

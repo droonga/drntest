@@ -95,16 +95,16 @@ module Drntest
         @config.engine_config = config
       end
 
-      parser.on("--fluentd=PATH",
-                "Path to the fluentd executable",
-                "(#{@config.fluentd})") do |fluentd|
-        @config.fluentd = fluentd
+      parser.on("--droonga-engine=PATH",
+                "Path to the droonga-engine executable",
+                "(#{@config.droonga_engine})") do |droonga_engine|
+        @config.droonga_engine = droonga_engine
       end
 
-      parser.on("--fluentd-options=OPTIONS",
-                "Options for fluentd",
+      parser.on("--droonga-engine-options=OPTIONS",
+                "Options for droonga-engine",
                 "You can specify this option multiple times") do |options|
-        @config.fluentd_options.concat(Shellwords.split(options))
+        @config.droonga_engine_options.concat(Shellwords.split(options))
       end
 
       parser.on("--test=PATTERN",

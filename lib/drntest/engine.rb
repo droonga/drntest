@@ -32,10 +32,6 @@ module Drntest
       teardown
     end
 
-    def config_file
-      @config.engine_config_path + "fluentd.conf"
-    end
-
     def catalog_file
       @config.engine_config_path + "catalog.json"
     end
@@ -101,12 +97,7 @@ module Drntest
     end
 
     def setup(target_path)
-      return unless temporary?
-
       setup_temporary_dir
-
-      temporary_config = temporary_dir + "fluentd.conf"
-      FileUtils.cp(config_file, temporary_config)
 
       catalog_json = load_catalog_json(target_path)
       temporary_catalog = temporary_dir + "catalog.json"
@@ -115,9 +106,11 @@ module Drntest
       end
 
       command = [
-        @config.fluentd,
-        "--config", temporary_config.to_s,
-        *@config.fluentd_options,
+        @config.droonga_engine,
+        "--host", @config.host,
+        "--port", @config.port.to_s,
+        "--tag", @config.tag,
+        *@config.droonga_engine_options,
       ]
       env = {
         "DROONGA_CATALOG" => temporary_catalog.to_s,
@@ -134,8 +127,6 @@ module Drntest
     end
 
     def teardown
-      return unless temporary?
-
       Process.kill(:TERM, @pid)
       Process.wait(@pid)
 
@@ -162,10 +153,6 @@ module Drntest
 
     def temporary_dir
       temporary_base_dir + "drntest"
-    end
-
-    def temporary?
-      @config.fluentd && config_file.exist?
     end
 
     def ready?
