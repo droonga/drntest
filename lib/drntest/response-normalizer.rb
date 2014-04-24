@@ -98,7 +98,7 @@ module Drntest
     end
 
     def normalize_groonga_command_body!(body)
-      return unless body.is_a?(Array)
+      return if not body.is_a?(Array) or body.empty?
 
       case @request["type"]
       when "table_list"
