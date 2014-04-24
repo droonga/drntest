@@ -29,7 +29,7 @@ module Drntest
   class TestRunner
     def initialize(config, target)
       @config = config
-      @target_path = Pathname(target)
+      @target_path = Pathname(target).expand_path
       @engine = Engine.new(@config)
     end
 
