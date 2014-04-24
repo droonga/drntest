@@ -103,14 +103,15 @@ module Drntest
 
       case @request["type"]
       when "table_list"
-        normalize_groonga_table_list_command_body!(body[0][1..-1])
+        normalize_groonga_table_list_command_body!(body)
       when "column_list"
-        normalize_groonga_column_list_command_body!(body[0][1..-1])
+        normalize_groonga_column_list_command_body!(body)
       end
     end
 
     TABLE_PATH_COLUMN_INDEX = 2
-    def normalize_groonga_table_list_command_body!(tables)
+    def normalize_groonga_table_list_command_body!(body)
+      tables = body[0][1..-1]
       return unless tables.is_a?(Array)
       tables.each do |table|
         if table[TABLE_PATH_COLUMN_INDEX].is_a?(String)
@@ -120,7 +121,8 @@ module Drntest
     end
 
     COLUMN_PATH_COLUMN_INDEX = 2
-    def normalize_groonga_column_list_command_body!(columns)
+    def normalize_groonga_column_list_command_body!(body)
+      columns = body[0][1..-1]
       return unless columns.is_a?(Array)
       columns.each do |column|
         if column[COLUMN_PATH_COLUMN_INDEX].is_a?(String)
