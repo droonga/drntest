@@ -102,9 +102,9 @@ module Drntest
 
       case @request["type"]
       when "table_list"
-        normalize_groonga_table_list_command_body!(body[1..-1])
+        normalize_groonga_table_list_command_body!(body[0][1..-1])
       when "column_list"
-        normalize_groonga_column_list_command_body!(body[1..-1])
+        normalize_groonga_column_list_command_body!(body[0][1..-1])
       end
     end
 
