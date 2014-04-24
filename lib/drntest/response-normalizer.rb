@@ -51,6 +51,7 @@ module Drntest
       "column_rename",
       "column_list",
       "select",
+      "delete",
     ]
     def groonga_command?
       GROONGA_COMMANDS.include?(@request["type"])
