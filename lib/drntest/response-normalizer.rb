@@ -80,6 +80,7 @@ module Drntest
 
     def normalize_groonga_command_response!(response)
       normalize_groonga_command_header!(response[0])
+      normalize_groonga_command_body!(response[1..-1])
     end
 
     def normalized_start_time
@@ -94,6 +95,37 @@ module Drntest
       return unless header.is_a?(Array)
       header[1] = normalized_start_time if valid_start_time?(header[1])
       header[2] = normalized_elapsed if valid_elapsed?(header[2])
+    end
+
+    def normalize_groonga_command_body!(body)
+      return unless body.is_a?(Array)
+
+      case @request["type"]
+      when "table_list"
+        normalize_groonga_table_list_command_body!(body[1..-1])
+      when "column_list"
+        normalize_groonga_column_list_command_body!(body[1..-1])
+      end
+    end
+
+    TABLE_PATH_COLUMN_INDEX = 2
+    def normalize_groonga_table_list_command_body!(tables)
+      return unless tables.is_a?(Array)
+      tables.each do |table|
+        if table[TABLE_PATH_COLUMN_INDEX].is_a?(String)
+          table[TABLE_PATH_COLUMN_INDEX] = "/path/to/table"
+        end
+      end
+    end
+
+    COLUMN_PATH_COLUMN_INDEX = 2
+    def normalize_groonga_column_list_command_body!(columns)
+      return unless columns.is_a?(Array)
+      columns.each do |column|
+        if column[COLUMN_PATH_COLUMN_INDEX].is_a?(String)
+          column[COLUMN_PATH_COLUMN_INDEX] = "/path/to/column"
+        end
+      end
     end
 
     def normalize_search_command_response!(response)
