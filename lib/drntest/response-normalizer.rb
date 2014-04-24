@@ -45,9 +45,11 @@ module Drntest
     GROONGA_COMMANDS = [
       "table_create",
       "table_remove",
+      "table_list",
       "column_create",
       "column_remove",
       "column_rename",
+      "column_list",
       "select",
     ]
     def groonga_command?
