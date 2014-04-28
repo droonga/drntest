@@ -1,6 +1,6 @@
 # News
 
-## 1.1.4: 2014-04-29 (planned)
+## 1.1.4: 2014-04-29
 
  * Supports more Groonga-compatible commands available at droonga-engine 1.0.2.
 
