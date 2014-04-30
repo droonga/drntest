@@ -123,6 +123,12 @@ module Drntest
         @suite_pattern = pattern
       end
 
+      parser.on("--timeout=TIMEOUT", Float,
+                "Wait TIMEOUT seconds for " +
+                  "receiving responses from Droonga engine") do |timeout|
+        @config.timeout = timeout
+      end
+
       parser
     end
 

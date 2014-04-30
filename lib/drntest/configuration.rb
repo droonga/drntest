@@ -19,6 +19,7 @@ module Drntest
     attr_accessor :base_path, :engine_config
     attr_accessor :droonga_engine, :droonga_engine_options
     attr_accessor :catalog_version
+    attr_accessor :timeout
 
     def initialize
       @port            = 24224
@@ -29,6 +30,7 @@ module Drntest
       @droonga_engine  = "droonga-engine"
       @droonga_engine_options = []
       @catalog_version = "2"
+      @timeout         = 1
     end
 
     def suite_path

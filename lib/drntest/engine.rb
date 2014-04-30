@@ -117,7 +117,7 @@ module Drntest
       }
       options = {
         :chdir => temporary_dir.to_s,
-        STDERR => STDOUT,
+        :err => :out,
       }
       arguments = [env, *command]
       arguments << options

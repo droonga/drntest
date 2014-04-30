@@ -29,7 +29,12 @@ module Drntest
     def execute
       catch do |abort_tag|
         begin
-          Droonga::Client.open(tag: @config.tag, port: @config.port) do |client|
+          options = {
+            :tag     => @config.tag,
+            :port    => @config.port,
+            :timeout => @config.timeout,
+          }
+          Droonga::Client.open(options) do |client|
             context = Context.new(client, @config, @results, abort_tag)
             operations.each do |operation|
               context.execute(operation)
