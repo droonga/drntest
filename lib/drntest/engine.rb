@@ -134,10 +134,17 @@ module Drntest
     end
 
     def setup_temporary_dir
-      tmpfs = Pathname("/run/shm")
-      if tmpfs.directory? and tmpfs.writable?
-        FileUtils.rm_rf(temporary_base_dir)
-        FileUtils.ln_s(tmpfs.to_s, temporary_base_dir.to_s)
+      tmpfs_candidates = [
+        "/dev/shm",
+        "/run/shm",
+      ]
+      tmpfs_candidates.each do |tmpfs_candidate|
+        tmpfs = Pathname(tmpfs_candidate)
+        if tmpfs.directory? and tmpfs.writable?
+          FileUtils.rm_rf(temporary_base_dir)
+          FileUtils.ln_s(tmpfs.to_s, temporary_base_dir.to_s)
+          break
+        end
       end
       FileUtils.rm_rf(temporary_dir)
       FileUtils.mkdir_p(temporary_dir)
