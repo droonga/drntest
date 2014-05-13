@@ -113,7 +113,7 @@ module Drntest
         *@config.droonga_engine_options,
       ]
       env = {
-        "DROONGA_CATALOG" => temporary_catalog.to_s,
+        "DROONGA_BASE_DIR" => temporary_dir.to_s,
       }
       options = {
         :chdir => temporary_dir.to_s,
