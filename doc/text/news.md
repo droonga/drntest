@@ -1,5 +1,11 @@
 # News
 
+## 1.1.5: 2014-05-29
+
+ * Add `--timeout` option to work on slow environment such as Travis CI.
+ * Support tmpfs at `/dev/shm`.
+ * Use the environment variable `DROONGA_BASE_DIR`.
+
 ## 1.1.4: 2014-04-29
 
  * Supports more Groonga-compatible commands available at droonga-engine 1.0.2.
