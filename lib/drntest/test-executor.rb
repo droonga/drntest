@@ -121,7 +121,7 @@ module Drntest
               "message" => "failed to normalize response",
               "detail" => "#{$!.message} (#{$!.class})",
               "backtrace" => $!.backtrace,
-                  "response" => raw_response,
+              "response" => raw_response,
             },
           }
         end
