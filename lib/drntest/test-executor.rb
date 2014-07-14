@@ -102,24 +102,28 @@ module Drntest
 
       def execute_request(request)
         if @logging
-          request_process = @client.request(request) do |response|
-            begin
-              @responses << normalize_response(request, response)
-            rescue
-              @responses << {
-                "error" => {
-                  "message" => "failed to normalize response",
-                  "detail" => "#{$!.message} (#{$!.class})",
-                  "backtrace" => $!.backtrace,
-                  "response" => response,
-                },
-              }
-            end
+          request_process = @client.request(request) do |raw_response|
+            @responses << clean_response(request, raw_response)
           end
           request_process.wait
         else
           @requests << @client.request(request) do
           end
+        end
+      end
+
+      def clean_response(request, raw_response)
+        begin
+          normalize_response(request, raw_response)
+        rescue
+          {
+            "error" => {
+              "message" => "failed to normalize response",
+              "detail" => "#{$!.message} (#{$!.class})",
+              "backtrace" => $!.backtrace,
+                  "response" => raw_response,
+            },
+          }
         end
       end
 
