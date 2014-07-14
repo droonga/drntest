@@ -62,6 +62,7 @@ module Drntest
         @requests = []
         @responses = []
         @logging = true
+        @sort_buffer = nil
       end
 
       def execute(operation)
@@ -97,13 +98,26 @@ module Drntest
             @results.omit(message)
             abort_execution
           end
+        when StartSortingDirective
+          @sort_buffer = []
+        when EndSortingDirective
+          sorted_responses = @sort_buffer.sort_by do |response|
+            response["type"]
+          end
+          @responses.concat(sorted_responses)
+          @sort_buffer = nil
         end
       end
 
       def execute_request(request)
         if @logging
           request_process = @client.request(request) do |raw_response|
-            @responses << clean_response(request, raw_response)
+            response = clean_response(request, raw_response)
+            if @sort_buffer
+              @sort_buffer << response
+            else
+              @responses << response
+            end
           end
           request_process.wait
         else

@@ -55,4 +55,10 @@ module Drntest
       @version = version
     end
   end
+
+  class StartSortingDirective < Directive
+  end
+
+  class EndSortingDirective < Directive
+  end
 end
