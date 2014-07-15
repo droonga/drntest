@@ -174,7 +174,7 @@ module Drntest
 
     def wait_until_ready
       until ready?
-        sleep 1
+        sleep(0.1)
       end
     end
   end
