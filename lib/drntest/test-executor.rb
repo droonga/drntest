@@ -17,6 +17,7 @@ require "droonga/client"
 
 require "drntest/test-loader"
 require "drntest/response-normalizer"
+require "drntest/responses-normalizer"
 
 module Drntest
   class TestExecutor
@@ -102,10 +103,12 @@ module Drntest
 
       def execute_request(request)
         if @logging
+          responses = []
           request_process = @client.request(request) do |raw_response|
-            @responses << clean_response(request, raw_response)
+            responses << clean_response(request, raw_response)
           end
           request_process.wait
+          @responses.concat(normalize_responses(request, responses))
         else
           @requests << @client.request(request) do
           end
@@ -136,6 +139,11 @@ module Drntest
 
       def normalize_response(request, response)
         normalizer = ResponseNormalizer.new(request, response)
+        normalizer.normalize
+      end
+
+      def normalize_responses(request, responses)
+        normalizer = ResponsesNormalizer.new(request, responses)
         normalizer.normalize
       end
 
