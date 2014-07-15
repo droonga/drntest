@@ -91,10 +91,6 @@ module Drntest
         OmitDirective.new(options.first)
       when :require_catalog_version
         RequireCatalogVersionDirective.new(Integer(options.first))
-      when :start_sorting
-        StartSortingDirective.new
-      when :end_sorting
-        EndSortingDirective.new
       else
         UnknownDirective.new(type, options)
       end
