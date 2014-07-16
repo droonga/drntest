@@ -124,9 +124,18 @@ module Drntest
       @pid = Process.spawn(*arguments)
 
       wait_until_ready
+      @ready_time = Time.now
     end
 
     def teardown
+      # TODO: REMOVE ME. Workaround for kill -TERM shutdown failure of
+      # omit tests.
+      running_time = Time.now - @ready_time
+      least_running_time = 1
+      if running_time < least_running_time
+        sleep(least_running_time - running_time)
+      end
+
       Process.kill(:TERM, @pid)
       Process.wait(@pid)
 
