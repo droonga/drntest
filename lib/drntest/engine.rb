@@ -105,37 +105,31 @@ module Drntest
         output.puts(JSON.pretty_generate(catalog_json))
       end
 
+      ready_notify_in, ready_notify_out = IO.pipe
       command = [
         @config.droonga_engine,
         "--host", @config.host,
         "--port", @config.port.to_s,
         "--tag", @config.tag,
+        "--base-dir", temporary_dir.to_s,
+        "--ready-notify-fd", ready_notify_out.fileno.to_s,
         *@config.droonga_engine_options,
       ]
       env = {
-        "DROONGA_BASE_DIR" => temporary_dir.to_s,
       }
       options = {
-        :chdir => temporary_dir.to_s,
         :err => :out,
+        ready_notify_out => ready_notify_out,
       }
       arguments = [env, *command]
       arguments << options
       @pid = Process.spawn(*arguments)
-
-      wait_until_ready
-      @ready_time = Time.now
+      ready_notify_out.close
+      wait_until_ready(ready_notify_in)
+      ready_notify_in.close
     end
 
     def teardown
-      # TODO: REMOVE ME. Workaround for kill -TERM shutdown failure of
-      # omit tests.
-      running_time = Time.now - @ready_time
-      least_running_time = 1
-      if running_time < least_running_time
-        sleep(least_running_time - running_time)
-      end
-
       Process.kill(:TERM, @pid)
       Process.wait(@pid)
 
@@ -171,20 +165,8 @@ module Drntest
       temporary_base_dir + "drntest"
     end
 
-    def ready?
-      begin
-        socket = TCPSocket.new(@config.host, @config.port)
-        socket.close
-        true
-      rescue Errno::ECONNREFUSED
-        false
-      end
-    end
-
-    def wait_until_ready
-      until ready?
-        sleep(0.1)
-      end
+    def wait_until_ready(ready_notify_in)
+      ready_notify_in.gets
     end
   end
 end
