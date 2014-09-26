@@ -1,5 +1,10 @@
 # News
 
+## 1.1.6: 2014-09-29 (planned)
+
+ * Sort dump responses for stable test result.
+ * Use `--ready-notify-fd` option to wait droonga-engine is ready.
+
 ## 1.1.5: 2014-05-29
 
  * Add `--timeout` option to work on slow environment such as Travis CI.
