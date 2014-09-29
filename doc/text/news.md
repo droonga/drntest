@@ -1,6 +1,6 @@
 # News
 
-## 1.1.6: 2014-09-29 (planned)
+## 1.1.6: 2014-09-29
 
  * Sort dump responses for stable test result.
  * Use `--ready-notify-fd` option to wait droonga-engine is ready.
