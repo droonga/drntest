@@ -125,7 +125,8 @@ module Drntest
       columns = body[0][1..-1]
       return unless columns.is_a?(Array)
       columns.each do |column|
-        if column[COLUMN_PATH_COLUMN_INDEX].is_a?(String)
+        value = column[COLUMN_PATH_COLUMN_INDEX]
+        if value.is_a?(String) and not value.empty?
           column[COLUMN_PATH_COLUMN_INDEX] = "/path/to/column"
         end
       end
