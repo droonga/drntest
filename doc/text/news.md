@@ -1,6 +1,6 @@
 # News
 
-## 1.1.7: 2014-11-29 (planned)
+## 1.1.7: 2014-11-18
 
  * Accept virtual column like `_key` as a part of Groonga's `column_list` command response.
 
