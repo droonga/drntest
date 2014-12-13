@@ -1,5 +1,11 @@
 # News
 
+## 1.1.8: 2014-12-13
+
+### Improvements
+
+  * Supported "InvalidValue" error message normalization.
+
 ## 1.1.7: 2014-11-18
 
  * Accept virtual column like `_key` as a part of Groonga's `column_list` command response.
