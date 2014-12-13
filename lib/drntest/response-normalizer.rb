@@ -73,10 +73,23 @@ module Drntest
     def normalize_errors(errors)
       normalized_errors = {}
       error_details = errors.values
+      error_details.each do |error_detail|
+        normalize_error_detail!(error_detail)
+      end
       errors.keys.each_with_index do |source, index|
         normalized_errors["sources#{index}"] = error_details[index]
       end
       normalized_errors
+    end
+
+    def normalize_error_detail!(error_detail)
+      case error_detail["body"]["name"]
+      when "InvalidValue"
+        message = error_detail["body"]["message"]
+        message = message.lines.first.chomp
+        message = message.gsub(/\#<(Groonga::[a-zA-Z]+) .*>\z/, "\#<\\1 ...>")
+        error_detail["body"]["message"] = message
+      end
     end
 
     def normalize_groonga_command_response!(response)
