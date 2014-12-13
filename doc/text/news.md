@@ -1,5 +1,11 @@
 # News
 
+## 1.1.9: 2014-12-13
+
+### Improvements
+
+  * Supported "InvalidValue" error message normalization at the top level.
+
 ## 1.1.8: 2014-12-13
 
 ### Improvements
