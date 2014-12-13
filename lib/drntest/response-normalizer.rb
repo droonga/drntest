@@ -66,6 +66,10 @@ module Drntest
       in_reply_to = message["inReplyTo"]
       message["inReplyTo"] = normalized_in_reply_to if in_reply_to
 
+      if message["statusCode"] != 200
+        normalize_error_body!(message["body"])
+      end
+
       errors = message["errors"]
       message["errors"] = normalize_errors(errors) if errors
     end
@@ -74,7 +78,7 @@ module Drntest
       normalized_errors = {}
       error_details = errors.values
       error_details.each do |error_detail|
-        normalize_error_detail!(error_detail)
+        normalize_error_body!(error_detail["body"])
       end
       errors.keys.each_with_index do |source, index|
         normalized_errors["sources#{index}"] = error_details[index]
@@ -82,13 +86,13 @@ module Drntest
       normalized_errors
     end
 
-    def normalize_error_detail!(error_detail)
-      case error_detail["body"]["name"]
+    def normalize_error_body!(body)
+      case body["name"]
       when "InvalidValue"
-        message = error_detail["body"]["message"]
+        message = body["message"]
         message = message.lines.first.chomp
         message = message.gsub(/\#<(Groonga::[a-zA-Z]+) .*>\z/, "\#<\\1 ...>")
-        error_detail["body"]["message"] = message
+        body["message"] = message
       end
     end
 
