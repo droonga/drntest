@@ -41,8 +41,11 @@ module Drntest
     ]
     def normalize_dump_responses
       @responses.sort_by do |response|
+        if response["error"] and response["response"]
+          response = response["response"]
+        end
         type = response["type"]
-        type_order = DUMP_TYPE_ORDER.index(type)
+        type_order = DUMP_TYPE_ORDER.index(type) || -1
         body = response["body"]
         case type
         when "dump.table"
