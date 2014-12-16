@@ -87,6 +87,7 @@ module Drntest
     end
 
     def normalize_error_body!(body)
+      return body unless body
       case body["name"]
       when "InvalidValue"
         message = body["message"]
