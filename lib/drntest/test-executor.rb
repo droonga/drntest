@@ -63,6 +63,8 @@ module Drntest
         @requests = []
         @responses = []
         @logging = true
+        @completion = nil
+        @validation = nil
       end
 
       def execute(operation)
@@ -98,19 +100,31 @@ module Drntest
             @results.omit(message)
             abort_execution
           end
+        when EnableCompletionDirective
+          @completion = true
+        when DisableCompletionDirective
+          @completion = false
+        when EnableValidationDirective
+          @validation = true
+        when DisableValidationDirective
+          @validation = false
         end
       end
 
       def execute_request(request)
+        options = {}
+        options[:completion] = @completion unless @completion.nil?
+        options[:validation] = @validation unless @validation.nil?
+
         if @logging
           responses = []
-          request_process = @client.request(request) do |raw_response|
+          request_process = @client.request(request, options) do |raw_response|
             responses << clean_response(request, raw_response)
           end
           request_process.wait
           @responses.concat(normalize_responses(request, responses))
         else
-          @requests << @client.request(request) do
+          @requests << @client.request(request, options) do
           end
         end
       end

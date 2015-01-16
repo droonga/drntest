@@ -55,4 +55,16 @@ module Drntest
       @version = version
     end
   end
+
+  class EnableCompletionDirective < Directive
+  end
+
+  class DisableCompletionDirective < Directive
+  end
+
+  class EnableValidationDirective < Directive
+  end
+
+  class DisableValidationDirective < Directive
+  end
 end

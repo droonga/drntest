@@ -91,6 +91,14 @@ module Drntest
         OmitDirective.new(options.first)
       when :require_catalog_version
         RequireCatalogVersionDirective.new(Integer(options.first))
+      when :enable_completion
+        EnableCompletionDirective.new
+      when :disable_completion
+        DisableCompletionDirective.new
+      when :enable_validation
+        EnableValidationDirective.new
+      when :disable_validation
+        DisableValidationDirective.new
       else
         UnknownDirective.new(type, options)
       end
