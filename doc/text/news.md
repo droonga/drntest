@@ -1,5 +1,15 @@
 # News
 
+## 1.2.0: 2015-01-29 (planned)
+
+### Improvements
+
+  * Supported new directives to activate/diactivate completion and validation of messages.
+    * `#@enable_completion` and `#@disable_completion` controls completion of request messages.
+      Required fields of request messages are automatically completed by default.
+    * `#@enable_validation` and `#@disable_validation` controls validation of request messages.
+      Messages are validated by default.
+
 ## 1.1.9: 2014-12-13
 
 ### Improvements
