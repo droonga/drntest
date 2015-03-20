@@ -42,6 +42,7 @@ module Drntest
       @engine.start(@target_path)
       begin
         results = process_requests
+        raise EngineStalled.new if results.status == :no_response
       ensure
         @engine.stop
       end
@@ -64,7 +65,6 @@ module Drntest
         remove_reject_file
       when :no_response
         puts "NO RESPONSE"
-        raise EngineStalled.new
       when :failure
         puts "FAILURE"
         save_reject_file(results.actuals)
