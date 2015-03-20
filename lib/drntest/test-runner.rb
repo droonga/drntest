@@ -26,6 +26,9 @@ require "drntest/engine"
 require "drntest/input-error"
 
 module Drntest
+  class EngineStalled < StandardError
+  end
+
   class TestRunner
     def initialize(config, target)
       @config = config
@@ -61,6 +64,7 @@ module Drntest
         remove_reject_file
       when :no_response
         puts "NO RESPONSE"
+        raise EngineStalled.new
       when :failure
         puts "FAILURE"
         save_reject_file(results.actuals)
