@@ -49,7 +49,11 @@ module Drntest
       tests = load_tests(*targets)
       tests.each do |test|
         test_runner = TestRunner.new(@config, test)
-        test_suites_result.test_results << test_runner.run
+        result = test_runner.run
+        test_suites_result.test_results << result
+        if result.status == :no_response and @config.exit_on_stalled?
+          break
+        end
       end
 
       puts
@@ -127,6 +131,11 @@ module Drntest
                 "Wait TIMEOUT seconds for " +
                   "receiving responses from Droonga engine") do |timeout|
         @config.timeout = timeout
+      end
+
+      parser.on("--exit-on-stalled",
+                "Stop running of tests when \"NO RESPONSE\" result appears on any testcase") do
+        @config.exit_on_stalled = true
       end
 
       parser
