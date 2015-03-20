@@ -98,6 +98,7 @@ module Drntest
     end
 
     def normalize_groonga_command_response!(response)
+      return unless response.is_a?(Array)
       normalize_groonga_command_header!(response[0])
       normalize_groonga_command_body!(response[1..-1])
     end
@@ -129,6 +130,7 @@ module Drntest
 
     TABLE_PATH_COLUMN_INDEX = 2
     def normalize_groonga_table_list_command_body!(body)
+      return unless body.is_a?(Array) or body.empty?
       tables = body[0][1..-1]
       return unless tables.is_a?(Array)
       tables.each do |table|
@@ -140,6 +142,7 @@ module Drntest
 
     COLUMN_PATH_COLUMN_INDEX = 2
     def normalize_groonga_column_list_command_body!(body)
+      return unless body.is_a?(Array) or body.empty?
       columns = body[0][1..-1]
       return unless columns.is_a?(Array)
       columns.each do |column|
