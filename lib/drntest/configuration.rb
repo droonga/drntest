@@ -20,7 +20,6 @@ module Drntest
     attr_accessor :droonga_engine, :droonga_engine_options
     attr_accessor :catalog_version
     attr_accessor :timeout
-    attr_writer   :exit_on_stalled
 
     def initialize
       @port            = 24224
@@ -32,7 +31,6 @@ module Drntest
       @droonga_engine_options = []
       @catalog_version = "2"
       @timeout         = 1
-      @exit_on_stalled = false
     end
 
     def suite_path
@@ -41,10 +39,6 @@ module Drntest
 
     def engine_config_path
       @base_path + "config" + @engine_config
-    end
-
-    def exit_on_stalled?
-      @exit_on_stalled
     end
   end
 end
