@@ -39,6 +39,8 @@ module Drntest
         normalize_groonga_command_response!(body)
       elsif search_command?
         normalize_search_command_response!(body)
+      elsif system_status_command?
+        normalize_system_status_command_response!(body)
       end
     end
 
@@ -59,6 +61,10 @@ module Drntest
 
     def search_command?
       @request["type"] == "search"
+    end
+
+    def system_status_command?
+      @request["type"] == "system.status"
     end
 
     def normalize_droonga_message_envelope!(message)
@@ -161,6 +167,13 @@ module Drntest
         if valid_elapsed?(result["elapsedTime"])
           result["elapsedTime"] = normalized_elapsed
         end
+      end
+    end
+
+    def normalize_system_status_command_response!(response)
+      reporter = response["reporter"]
+      if reporter
+        response["reporter"] = reporter.sub(/:\d+/, ":0")
       end
     end
 
