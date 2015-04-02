@@ -1,6 +1,6 @@
 # News
 
-## 1.2.0: 2015-01-29 (planned)
+## 1.2.0: 2015-03-29 (planned)
 
 ### Improvements
 
@@ -9,6 +9,8 @@
       Required fields of request messages are automatically completed by default.
     * `#@enable_validation` and `#@disable_validation` controls validation of request messages.
       Messages are validated by default.
+  * A `NO RESPONSE` result is now returned immediately, for a stalled engine process.
+  * Invalid format responses for Groonga commands are now ignored.
 
 ## 1.1.9: 2014-12-13
 
