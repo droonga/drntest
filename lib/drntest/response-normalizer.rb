@@ -76,6 +76,10 @@ module Drntest
         normalize_error_body!(message["body"])
       end
 
+      if message["date"].is_a?(String)
+        message["date"] = "0000-00-00T00:00:00.000000Z"
+      end
+
       errors = message["errors"]
       message["errors"] = normalize_errors(errors) if errors
     end
