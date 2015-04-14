@@ -21,9 +21,13 @@ module Drntest
     end
 
     def normalize
-      return @responses unless dump_command?
-
-      normalize_dump_responses
+      if dump_command?
+        normalize_dump_responses
+      elsif system_absorb_data_command?
+        normalize_system_absorb_data_responses
+      else
+        @responses 
+      end
     end
 
     private
@@ -54,6 +58,34 @@ module Drntest
           body_order = "#{body['table']}.#{body['name']}"
         when "dump.record"
           body_order = "#{body['table']}.#{body['key']}"
+        else
+          body_order = ""
+        end
+        [type_order, body_order]
+      end
+    end
+
+    def system_absorb_data_command?
+      @request["type"] == "system.absorb-data"
+    end
+
+    SYSTEM_ABSORB_DATA_ORDER = [
+      "system.absorb.start",
+      "system.absorb.result",
+      "system.absorb.progress",
+      "system.absorb.end",
+    ]
+    def normalize_system_absorb_data_responses
+      @responses.sort_by do |response|
+        if response["error"] and response["response"]
+          response = response["response"]
+        end
+        type = response["type"]
+        type_order = SYSTEM_ABSORB_DATA_ORDER.index(type) || -1
+        body = response["body"]
+        case type
+        when "system.absorb.progress"
+          body_order = body["nProcessedMessages"]
         else
           body_order = ""
         end
