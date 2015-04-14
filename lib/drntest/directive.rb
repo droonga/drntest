@@ -81,15 +81,15 @@ module Drntest
       @timeout_seconds = nil
 
       parameters.each do |parameter|
-      if parameter =~ /\A(\d+)(?:messages|msg)?\z/
-        @max_messages = $1.to_i
-      elsif parameter =~ /\A(\d+\.?|\.\d+|\d+\.\d+)s(?:ec(?:onds?)?)?\z/
-        @timeout_seconds = $1.to_f
-      elsif parameter =~ /\A(\d+\.?|\.\d+|\d+\.\d+)m(?:inutes?)?\z/
-        @timeout_seconds = $1.to_f * ONE_MINUTE_IN_SECONDS
-      elsif parameter =~ /\A(\d+\.?|\.\d+|\d+\.\d+)h(?:ours?)?\z/
-        @timeout_seconds = $1.to_f * ONE_HOUR_IN_SECONDS
-      end
+        if parameter =~ /\A(\d+)(?:messages|msg)?\z/
+          @max_messages = $1.to_i
+        elsif parameter =~ /\A(\d+\.?|\.\d+|\d+\.\d+)s(?:ec(?:onds?)?)?\z/
+          @timeout_seconds = $1.to_f
+        elsif parameter =~ /\A(\d+\.?|\.\d+|\d+\.\d+)m(?:inutes?)?\z/
+          @timeout_seconds = $1.to_f * ONE_MINUTE_IN_SECONDS
+        elsif parameter =~ /\A(\d+\.?|\.\d+|\d+\.\d+)h(?:ours?)?\z/
+          @timeout_seconds = $1.to_f * ONE_HOUR_IN_SECONDS
+        end
       end
 
       if @max_messages.nil? and @timeout_seconds.nil?
