@@ -129,10 +129,10 @@ module Drntest
             request_process.wait
             @subscribe = false
           else
-          request_process = @client.request(request, options) do |raw_response|
-            responses << clean_response(request, raw_response)
-          end
-          request_process.wait
+            request_process = @client.request(request, options) do |raw_response|
+              responses << clean_response(request, raw_response)
+            end
+            request_process.wait
           end
           @responses.concat(normalize_responses(request, responses))
         else
