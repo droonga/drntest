@@ -108,6 +108,9 @@ module Drntest
           @validation = true
         when DisableValidationDirective
           @validation = false
+        when SubscribeUntil
+          @subscribe = true
+          @timeout_seconds = directive.timeout_seconds
         end
       end
 
@@ -118,10 +121,19 @@ module Drntest
 
         if @logging
           responses = []
+          if @subscribe
+            options[:timeout_seconds] = @timeout_seconds
+            request_process = @client.subscribe(request, options) do |raw_response|
+              responses << clean_response(request, raw_response)
+            end
+            request_process.wait
+            @subscribe = false
+          else
           request_process = @client.request(request, options) do |raw_response|
             responses << clean_response(request, raw_response)
           end
           request_process.wait
+          end
           @responses.concat(normalize_responses(request, responses))
         else
           @requests << @client.request(request, options) do
