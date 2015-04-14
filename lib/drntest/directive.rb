@@ -67,4 +67,25 @@ module Drntest
 
   class DisableValidationDirective < Directive
   end
+
+  class SubscribeUntil < Directive
+    attr_reader :timeout_seconds
+
+    DEFAULT_TIMEOUT_SECONDS = 1
+
+    ONE_MINUTE_IN_SECONDS = 60
+    ONE_HOUR_IN_SECONDS = ONE_MINUTE_IN_SECONDS * 60
+
+    def initialize(timeout)
+      if timeout =~ /\A(\d+\.?|\.\d+|\d+\.\d+)s(?:ec(?:onds?)?)?\z/
+        @timeout_seconds = $1.to_f
+      elsif timeout =~ /\A(\d+\.?|\.\d+|\d+\.\d+)m(?:inutes?)?\z/
+        @timeout_seconds = $1.to_f * ONE_MINUTE_IN_SECONDS
+      elsif timeout =~ /\A(\d+\.?|\.\d+|\d+\.\d+)h(?:ours?)?\z/
+        @timeout_seconds = $1.to_f * ONE_HOUR_IN_SECONDS
+      else
+        @timeout_seconds = DEFAULT_TIMEOUT_SECONDS
+      end
+    end
+  end
 end
