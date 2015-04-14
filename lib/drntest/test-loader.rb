@@ -100,7 +100,7 @@ module Drntest
       when :disable_validation
         DisableValidationDirective.new
       when :subscribe_until
-        SubscribeUntil.new(options.first)
+        SubscribeUntil.new(options)
       else
         UnknownDirective.new(type, options)
       end

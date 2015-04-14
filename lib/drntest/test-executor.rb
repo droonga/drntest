@@ -111,6 +111,7 @@ module Drntest
         when SubscribeUntil
           @subscribe = true
           @timeout_seconds = directive.timeout_seconds
+          @max_messages = directive.max_messages
         end
       end
 
@@ -122,7 +123,8 @@ module Drntest
         if @logging
           responses = []
           if @subscribe
-            options[:timeout_seconds] = @timeout_seconds
+            options[:subscription_timeout] = @timeout_seconds
+            options[:max_messages] = @max_messages
             request_process = @client.subscribe(request, options) do |raw_response|
               responses << clean_response(request, raw_response)
             end

@@ -69,21 +69,30 @@ module Drntest
   end
 
   class SubscribeUntil < Directive
-    attr_reader :timeout_seconds
+    attr_reader :max_messages, :timeout_seconds
 
     DEFAULT_TIMEOUT_SECONDS = 1
 
     ONE_MINUTE_IN_SECONDS = 60
     ONE_HOUR_IN_SECONDS = ONE_MINUTE_IN_SECONDS * 60
 
-    def initialize(timeout)
-      if timeout =~ /\A(\d+\.?|\.\d+|\d+\.\d+)s(?:ec(?:onds?)?)?\z/
+    def initialize(parameters)
+      @max_messages = nil
+      @timeout_seconds = nil
+
+      parameters.each do |parameter|
+      if parameter =~ /\A(\d+)(?:messages|msg)?\z/
+        @max_messages = $1.to_i
+      elsif parameter =~ /\A(\d+\.?|\.\d+|\d+\.\d+)s(?:ec(?:onds?)?)?\z/
         @timeout_seconds = $1.to_f
-      elsif timeout =~ /\A(\d+\.?|\.\d+|\d+\.\d+)m(?:inutes?)?\z/
+      elsif parameter =~ /\A(\d+\.?|\.\d+|\d+\.\d+)m(?:inutes?)?\z/
         @timeout_seconds = $1.to_f * ONE_MINUTE_IN_SECONDS
-      elsif timeout =~ /\A(\d+\.?|\.\d+|\d+\.\d+)h(?:ours?)?\z/
+      elsif parameter =~ /\A(\d+\.?|\.\d+|\d+\.\d+)h(?:ours?)?\z/
         @timeout_seconds = $1.to_f * ONE_HOUR_IN_SECONDS
-      else
+      end
+      end
+
+      if @max_messages.nil? and @timeout_seconds.nil?
         @timeout_seconds = DEFAULT_TIMEOUT_SECONDS
       end
     end
