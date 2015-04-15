@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Droonga Project
+# Copyright (C) 2013-2015  Droonga Project
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -81,13 +81,14 @@ module Drntest
       @timeout_seconds = nil
 
       parameters.each do |parameter|
-        if parameter =~ /\A(\d+)(?:messages|msg)?\z/
+        case parameter
+        when /\A(\d+)(?:messages|msg)?\z/
           @max_messages = $1.to_i
-        elsif parameter =~ /\A(\d+\.?|\.\d+|\d+\.\d+)s(?:ec(?:onds?)?)?\z/
+        when /\A(\d+\.?|\.\d+|\d+\.\d+)s(?:ec(?:onds?)?)?\z/
           @timeout_seconds = $1.to_f
-        elsif parameter =~ /\A(\d+\.?|\.\d+|\d+\.\d+)m(?:inutes?)?\z/
+        when /\A(\d+\.?|\.\d+|\d+\.\d+)m(?:inutes?)?\z/
           @timeout_seconds = $1.to_f * ONE_MINUTE_IN_SECONDS
-        elsif parameter =~ /\A(\d+\.?|\.\d+|\d+\.\d+)h(?:ours?)?\z/
+        when /\A(\d+\.?|\.\d+|\d+\.\d+)h(?:ours?)?\z/
           @timeout_seconds = $1.to_f * ONE_HOUR_IN_SECONDS
         end
       end
