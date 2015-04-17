@@ -38,6 +38,7 @@ module Drntest
     DUMP_TYPE_ORDER = [
       "dump.start",
       "dump.result",
+      "dump.forecast",
       "dump.table",
       "dump.column",
       "dump.record",
@@ -52,6 +53,8 @@ module Drntest
         type_order = DUMP_TYPE_ORDER.index(type) || -1
         body = response["body"]
         case type
+        when "dump.forecast"
+          body_order = body["nMessages"]
         when "dump.table"
           body_order = body["name"]
         when "dump.column"
