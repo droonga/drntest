@@ -9,9 +9,9 @@
       Required fields of request messages are automatically completed by default.
     * `#@enable_validation` and `#@disable_validation` controls validation of request messages.
       Messages are validated by default.
-    * `#@subscribe-until` directive, for subscription type commands like `dump`.
-      You can unsubscribe the next request following to the directive automatically with given timeout, like:
-      `#@subscribe-until 10s`
+  * `#@subscribe-until` directive, for subscription type commands like `dump`.
+    You can unsubscribe the next request following to the directive automatically with given timeout, like:
+    `#@subscribe-until 10s`
   * A `NO RESPONSE` result is now returned immediately, for a stalled engine process.
   * Invalid format responses for Groonga commands are now ignored.
 
