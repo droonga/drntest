@@ -97,6 +97,10 @@ module Drntest
     end
 
     def expected_path
+      expected_for_config = @target_path.sub_ext(".expected.#{@config.engine_config}")
+      if expected_for_config.exist?
+        return expected_for_config
+      end
       @target_path.sub_ext(".expected")
     end
 
