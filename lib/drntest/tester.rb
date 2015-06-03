@@ -142,6 +142,7 @@ module Drntest
         next unless target_path.exist?
         if target_path.directory?
           tests += Pathname.glob(target_path + "**" + "*.test")
+          tests += Pathname.glob(target_path + "**" + "*.test.#{@config.engine_config}")
         else
           tests << target_path
         end
