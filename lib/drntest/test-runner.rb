@@ -45,7 +45,7 @@ module Drntest
     def run
       relative_target_path = @target_path.relative_path_from(@config.suite_path)
       print "#{relative_target_path}: "
-      @engine.start(@target_path)
+      @engine.start(@target_base_path)
       begin
         results = process_requests
         raise EngineStalled.new if results.status == :no_response
