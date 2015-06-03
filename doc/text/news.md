@@ -1,5 +1,24 @@
 # News
 
+## 1.3.0: 2015-06-29 (planned)
+
+### Improvements
+
+ * Supports configuration specific expected result and catalog.
+   You can provide extra flies for your tests with specific configuration, like:
+   - `(test name).expected.(config name)`
+   - `(test name).catalog.json.(config name)`
+ * Supports configuration specific tests.
+   Tests named like `(test name).test.(config name)` are processed only when the configuration is used.
+   However you don't need to give suffix for other related files.
+   For example, all these combinations work correctly:
+   - `(test name).test.(config name)`,
+     `(test name).catalog.json.(config name)` and
+     `(test name).expected.(config name)`
+   - `(test name).test.(config name)`,
+     `(test name).catalog.json` and
+     `(test name).expected`
+
 ## 1.2.0: 2015-04-29
 
 ### Improvements
