@@ -33,6 +33,12 @@ module Drntest
     def initialize(config, target)
       @config = config
       @target_path = Pathname(target).expand_path
+      @target_base_path = @target_path.dirname + @target_path.basename(".#{@config.engine_config}")
+      if @target_path != @target_base_path
+        @target_suffix = ".#{@config.engine_config}"
+      else
+        @target_suffix = ""
+      end
       @engine = Engine.new(@config)
     end
 
@@ -97,19 +103,19 @@ module Drntest
     end
 
     def expected_path
-      expected_for_config = @target_path.sub_ext(".expected.#{@config.engine_config}")
+      expected_for_config = @target_base_path.sub_ext(".expected#{@target_suffix}")
       if expected_for_config.exist?
         return expected_for_config
       end
-      @target_path.sub_ext(".expected")
+      @target_base_path.sub_ext(".expected")
     end
 
     def reject_path
-      @target_path.sub_ext(".reject")
+      @target_base_path.sub_ext(".reject#{@target_suffix}")
     end
 
     def actual_path
-      @target_path.sub_ext(".actual")
+      @target_base_path.sub_ext(".actual#{@target_suffix}")
     end
 
     def remove_reject_file
