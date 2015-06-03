@@ -44,7 +44,7 @@ module Drntest
       when 1
         extract_connection_info_catalog_v1(catalog_json)
       when 2
-        custom_catalog_json_file = target_path.sub_ext(".catalog.json")
+        custom_catalog_json_file = custom_catalog_json(target_path)
         if custom_catalog_json_file.exist?
           custom_catalog_json = JSON.parse(custom_catalog_json_file.read)
           merge_catalog_v2!(catalog_json, custom_catalog_json)
@@ -52,6 +52,15 @@ module Drntest
         extract_connection_info_catalog_v2(catalog_json)
       end
       catalog_json
+    end
+
+    def custom_catalog_json(target_path)
+      catalog_json_for_config = target_path.sub_ext(".catalog.json.#{@config.engine_config}")
+      if catalog_json_for_config.exist?
+        catalog_json_for_config
+      else
+        target_path.sub_ext(".catalog.json")
+      end
     end
 
     def extract_connection_info_catalog_v1(catalog_json)
