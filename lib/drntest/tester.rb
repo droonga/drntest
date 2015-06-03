@@ -150,7 +150,8 @@ module Drntest
 
       unless @test_pattern.nil?
         tests.select! do |test|
-          @test_pattern === test.basename(".test").to_s
+          @test_pattern === test.basename(".test").to_s or
+            @test_pattern === test.basename(".test.#{@config.engine_config}").to_s
         end
       end
 
